@@ -4,8 +4,13 @@ import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 import { SITE_TITLE } from '../../consts';
 import { t } from '../../i18n/translations';
+import { getCollection } from 'astro:content';
 
 const locale = 'zh';
+const posts = await getCollection('blog', (entry) => entry.id.startsWith(locale + '/'));
+const sortedPosts = posts
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
@@ -23,7 +28,28 @@ const locale = 'zh';
 
       <section class="posts">
         <h2>{t('home.writing', locale)}</h2>
-        <p>{t('home.empty', locale)}</p>
+        {
+          sortedPosts.length === 0 ? (
+            <p>{t('home.empty', locale)}</p>
+          ) : (
+            <ul>
+              {sortedPosts.map((post) => (
+                <li>
+                  <a href={`/${locale}/blog/${post.id.replace(locale + '/', '')}`}>
+                    <span class="post-title">{post.data.title}</span>
+                    <span class="post-date">
+                      {post.data.pubDate.toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
       </section>
     </main>
     <Footer locale={locale} />
