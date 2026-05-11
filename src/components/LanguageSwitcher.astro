@@ -1,0 +1,32 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const currentLocale = Astro.currentLocale || 'en';
+const otherLocale = currentLocale === 'en' ? 'zh' : 'en';
+
+// Build the URL for the other locale using the current path.
+// Strip the current locale prefix, prepend the other locale.
+const currentPath = Astro.url.pathname;
+const pathWithoutLocale = currentPath.replace(new RegExp(`^/${currentLocale}(/|$)`), '/$1').replace(/\/$/, '') || '/';
+const otherUrl = getRelativeLocaleUrl(otherLocale, pathWithoutLocale === '/' ? '' : pathWithoutLocale.replace(/^\//, ''));
+---
+
+<a href={otherUrl} class="lang-switch" title={currentLocale === 'en' ? '切换到中文' : 'Switch to English'}>
+  {currentLocale === 'en' ? '中文' : 'EN'}
+</a>
+
+<style>
+  .lang-switch {
+    font-size: 0.85em;
+    padding: 0.3em 0.6em;
+    border: 1px solid rgb(var(--gray-light));
+    border-radius: 4px;
+    text-decoration: none;
+    color: rgb(var(--gray));
+    transition: all 0.2s ease;
+  }
+  .lang-switch:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>

@@ -7,7 +7,27 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://toddzheng.net',
-	integrations: [mdx(), sitemap()],
+	integrations: [mdx(), sitemap({
+		i18n: {
+			defaultLocale: 'en',
+			locales: {
+				en: 'en-US',
+				zh: 'zh-CN',
+			},
+		},
+	})],
+	i18n: {
+		defaultLocale: 'en',
+		locales: ['en', 'zh'],
+		routing: {
+			prefixDefaultLocale: true,
+		},
+	},
+	vite: {
+		preview: {
+			allowedHosts: ['todds-mac-mini.local', 'todds-mac-mini.tail961bf8.ts.net', '.local', '.ts.net'],
+		},
+	},
 	markdown: {
 		shikiConfig: {
 			theme: 'github-dark',

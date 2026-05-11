@@ -1,0 +1,94 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+import { t } from '../../i18n/translations';
+import { getCollection } from 'astro:content';
+
+const locale = Astro.currentLocale || 'en';
+const posts = await getCollection('blog', (entry) => entry.id.startsWith(locale + '/'));
+const sortedPosts = posts
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<!doctype html>
+<html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <BaseHead title={SITE_TITLE} description={t('home.intro', locale)} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="hero">
+        <h1>{t('home.heading', locale)}</h1>
+        <p>{t('home.intro', locale)}</p>
+      </section>
+
+      <section class="posts">
+        <h2>{t('home.writing', locale)}</h2>
+        {
+          sortedPosts.length === 0 ? (
+            <p>{t('home.empty', locale)}</p>
+          ) : (
+            <ul>
+              {sortedPosts.map((post) => (
+                <li>
+                  <a href={`/${locale}/blog/${post.id.replace(locale + '/', '')}`}>
+                    <span class="post-title">{post.data.title}</span>
+                    <span class="post-date">
+                      {post.data.pubDate.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>
+
+<style>
+  .hero {
+    margin-bottom: 3em;
+  }
+  .hero h1 {
+    font-size: 2em;
+    margin-bottom: 0.25em;
+  }
+  .hero p {
+    color: rgb(var(--gray));
+    font-size: 1.1em;
+    max-width: 620px;
+  }
+  .posts ul {
+    list-style: none;
+    padding: 0;
+  }
+  .posts li {
+    margin-bottom: 0.75em;
+  }
+  .posts a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    text-decoration: none;
+    gap: 1em;
+  }
+  .post-title {
+    font-weight: 600;
+  }
+  .post-date {
+    color: rgb(var(--gray));
+    font-size: 0.85em;
+    white-space: nowrap;
+  }
+</style>

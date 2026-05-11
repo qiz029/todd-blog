@@ -1,95 +1,14 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { getCollection } from 'astro:content';
-
-const posts = await getCollection('blog');
-const sortedPosts = posts
-  .filter((p) => !p.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+import { getRelativeLocaleUrl } from 'astro:i18n';
 ---
-
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <meta http-equiv="refresh" content="0;url=/en/" />
+    <link rel="canonical" href="/en/" />
+    <title>Redirecting…</title>
   </head>
   <body>
-    <Header />
-    <main>
-      <section class="hero">
-        <h1>Hi, I'm Todd.</h1>
-        <p>
-          Software engineer. I think about systems, compilers, and how to make
-          computers do less work. This is where I write things down.
-        </p>
-      </section>
-
-      <section class="posts">
-        <h2>Posts</h2>
-        {
-          sortedPosts.length === 0 ? (
-            <p>Nothing here yet. Working on it.</p>
-          ) : (
-            <ul>
-              {sortedPosts.map((post) => (
-                <li>
-                  <a href={`/blog/${post.id}`}>
-                    <span class="post-title">{post.data.title}</span>
-                    <span class="post-date">
-                      {post.data.pubDate.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </section>
-    </main>
-    <Footer />
+    <p>Redirecting to <a href={getRelativeLocaleUrl('en', '/')}>English site</a>…</p>
   </body>
 </html>
-
-<style>
-  .hero {
-    margin-bottom: 3em;
-  }
-  .hero h1 {
-    font-size: 2em;
-    margin-bottom: 0.25em;
-  }
-  .hero p {
-    color: rgb(var(--gray));
-    font-size: 1.1em;
-    max-width: 560px;
-  }
-  .posts ul {
-    list-style: none;
-    padding: 0;
-  }
-  .posts li {
-    margin-bottom: 0.75em;
-  }
-  .posts a {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    text-decoration: none;
-    gap: 1em;
-  }
-  .post-title {
-    font-weight: 600;
-  }
-  .post-date {
-    color: rgb(var(--gray));
-    font-size: 0.85em;
-    white-space: nowrap;
-  }
-</style>

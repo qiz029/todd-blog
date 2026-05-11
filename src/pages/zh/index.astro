@@ -1,0 +1,42 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+import { t } from '../../i18n/translations';
+
+const locale = 'zh';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <BaseHead title={SITE_TITLE} description={t('home.intro', locale)} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="hero">
+        <h1>{t('home.heading', locale)}</h1>
+        <p>{t('home.intro', locale)}</p>
+      </section>
+
+      <section class="posts">
+        <h2>{t('home.writing', locale)}</h2>
+        <p>{t('home.empty', locale)}</p>
+      </section>
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>
+
+<style>
+  .hero { margin-bottom: 3em; }
+  .hero h1 { font-size: 2em; margin-bottom: 0.25em; }
+  .hero p { color: rgb(var(--gray)); font-size: 1.1em; max-width: 620px; }
+  .posts ul { list-style: none; padding: 0; }
+  .posts li { margin-bottom: 0.75em; }
+  .posts a { display: flex; justify-content: space-between; align-items: baseline; text-decoration: none; gap: 1em; }
+  .post-title { font-weight: 600; }
+  .post-date { color: rgb(var(--gray)); font-size: 0.85em; white-space: nowrap; }
+</style>
