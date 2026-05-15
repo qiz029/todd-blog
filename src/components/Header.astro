@@ -10,7 +10,11 @@ const locale = Astro.currentLocale || 'en';
 
 <header>
   <nav>
-    <h2><a href={getRelativeLocaleUrl(locale, '/')}>{SITE_TITLE}</a></h2>
+    <h2>
+      <a href={getRelativeLocaleUrl(locale, '/')} class="brand">
+        <span class="brand-bold">Todd</span><span class="brand-light">Talk</span>
+      </a>
+    </h2>
     <div class="internal-links">
       <HeaderLink href={getRelativeLocaleUrl(locale, '/')}>{t('nav.home', locale)}</HeaderLink>
       <HeaderLink href={getRelativeLocaleUrl(locale, '/blog')}>{t('nav.blog', locale)}</HeaderLink>
@@ -33,6 +37,23 @@ const locale = Astro.currentLocale || 'en';
   h2 a,
   h2 a.active {
     text-decoration: none;
+  }
+  .brand {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    font-size: 1.15em;
+  }
+  .brand-bold {
+    font-weight: 900;
+    color: #E62B1E;
+  }
+  .brand-light {
+    font-weight: 300;
+    color: #111;
+  }
+  .brand:hover .brand-bold {
+    color: #cc2418;
   }
   nav {
     display: flex;
