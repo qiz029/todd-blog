@@ -27,15 +27,14 @@ const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = A
       .hero-image img {
         display: block;
         margin: 0 auto;
-        border-radius: 12px;
-        box-shadow: var(--box-shadow);
+        border-radius: 4px;
       }
       .prose {
         width: 720px;
         max-width: calc(100% - 2em);
         margin: auto;
         padding: 1em;
-        color: rgb(var(--gray-dark));
+        color: var(--text);
       }
       .title {
         margin-bottom: 1em;
@@ -45,13 +44,19 @@ const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = A
       }
       .title h1 {
         margin: 0 0 0.5em 0;
+        color: var(--text);
       }
       .date {
         margin-bottom: 0.5em;
-        color: rgb(var(--gray));
+        color: var(--text-muted);
+        font-family: monospace;
+        font-size: 0.85em;
       }
       .last-updated-on {
         font-style: italic;
+      }
+      .title hr {
+        margin-top: 1.5em;
       }
     </style>
   </head>
@@ -60,9 +65,11 @@ const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = A
     <Header />
     <main>
       <article>
-        <div class="hero-image">
-          {heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-        </div>
+        {heroImage && (
+          <div class="hero-image">
+            <Image width={1020} height={510} src={heroImage} alt="" />
+          </div>
+        )}
         <div class="prose">
           <div class="title">
             <div class="date">

@@ -27,8 +27,8 @@ const locale = Astro.currentLocale || 'en';
   header {
     margin: 0;
     padding: 0 1em;
-    background: white;
-    box-shadow: 0 2px 8px rgba(var(--black), 5%);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
   }
   h2 {
     margin: 0;
@@ -50,7 +50,7 @@ const locale = Astro.currentLocale || 'en';
   }
   .brand-light {
     font-weight: 300;
-    color: #111;
+    color: var(--text);
   }
   .brand:hover .brand-bold {
     color: #cc2418;
@@ -62,12 +62,16 @@ const locale = Astro.currentLocale || 'en';
   }
   nav a {
     padding: 1em 0.5em;
-    color: var(--black);
-    border-bottom: 4px solid transparent;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
     text-decoration: none;
   }
   nav a.active {
     text-decoration: none;
+    color: var(--text);
     border-bottom-color: var(--accent);
+  }
+  nav a:hover {
+    color: var(--text);
   }
 </style>

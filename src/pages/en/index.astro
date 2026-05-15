@@ -17,33 +17,150 @@ const sortedPosts = posts
 <html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
   <head>
     <BaseHead title={SITE_TITLE} description={t('home.intro', locale)} />
+    <style>
+      /* ── Hero ── */
+      .hero {
+        margin-bottom: 4em;
+      }
+      .hero-geo {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 2em;
+      }
+      .hero-geo span {
+        display: block;
+        height: 3px;
+      }
+      .hero-geo .g1 { width: 48px; background: var(--accent); }
+      .hero-geo .g2 { width: 24px; background: var(--accent-amber); }
+      .hero-geo .g3 { width: 12px; background: var(--text-muted); }
+      .hero h1 {
+        font-size: 2.8em;
+        margin-bottom: 0.25em;
+        letter-spacing: -0.02em;
+      }
+      .hero .sub {
+        color: var(--text-muted);
+        font-size: 1.1em;
+        max-width: 560px;
+        line-height: 1.6;
+      }
+      .hero .sub em {
+        color: var(--accent-amber);
+        font-style: normal;
+      }
+
+      /* ── Posts ── */
+      .posts-header {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        margin-bottom: 2em;
+      }
+      .posts-header h2 {
+        margin: 0;
+        font-size: 1.25em;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+      }
+      .posts-header hr {
+        flex: 1;
+        margin: 0;
+      }
+
+      .post-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .post-card {
+        margin-bottom: 0;
+      }
+      .post-card a {
+        display: block;
+        padding: 1.2em 0;
+        border-bottom: 1px solid var(--border);
+        text-decoration: none;
+        transition: padding-left 0.15s ease;
+      }
+      .post-card:first-child a {
+        border-top: 1px solid var(--border);
+      }
+      .post-card a:hover {
+        padding-left: 1em;
+        border-bottom-color: var(--accent);
+      }
+      .post-card a:hover + .post-card a {
+        border-top-color: var(--accent);
+      }
+      .post-title {
+        font-size: 1.15em;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.2em;
+      }
+      .post-desc {
+        font-size: 0.9em;
+        color: var(--text-muted);
+        margin-bottom: 0.3em;
+        line-height: 1.5;
+      }
+      .post-date {
+        font-size: 0.8em;
+        color: var(--text-muted);
+        font-family: monospace;
+      }
+      .post-card a:hover .post-title {
+        color: var(--accent);
+      }
+
+      .empty {
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      @media (max-width: 720px) {
+        .hero h1 { font-size: 2em; }
+        .post-card a:hover { padding-left: 0.5em; }
+      }
+    </style>
   </head>
   <body>
     <Header />
     <main>
       <section class="hero">
+        <div class="hero-geo">
+          <span class="g1"></span>
+          <span class="g2"></span>
+          <span class="g3"></span>
+        </div>
         <h1>{t('home.heading', locale)}</h1>
-        <p>{t('home.intro', locale)}</p>
+        <p class="sub">{t('home.intro', locale)}</p>
       </section>
 
-      <section class="posts">
-        <h2>{t('home.writing', locale)}</h2>
+      <section>
+        <div class="posts-header">
+          <h2>{t('home.writing', locale)}</h2>
+          <hr />
+        </div>
         {
           sortedPosts.length === 0 ? (
-            <p>{t('home.empty', locale)}</p>
+            <p class="empty">{t('home.empty', locale)}</p>
           ) : (
-            <ul>
+            <ul class="post-list">
               {sortedPosts.map((post) => (
-                <li>
+                <li class="post-card">
                   <a href={`/${locale}/blog/${post.id.replace(locale + '/', '')}`}>
-                    <span class="post-title">{post.data.title}</span>
-                    <span class="post-date">
+                    <div class="post-title">{post.data.title}</div>
+                    {post.data.description && <div class="post-desc">{post.data.description}</div>}
+                    <div class="post-date">
                       {post.data.pubDate.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                       })}
-                    </span>
+                    </div>
                   </a>
                 </li>
               ))}
@@ -55,40 +172,3 @@ const sortedPosts = posts
     <Footer locale={locale} />
   </body>
 </html>
-
-<style>
-  .hero {
-    margin-bottom: 3em;
-  }
-  .hero h1 {
-    font-size: 2em;
-    margin-bottom: 0.25em;
-  }
-  .hero p {
-    color: rgb(var(--gray));
-    font-size: 1.1em;
-    max-width: 620px;
-  }
-  .posts ul {
-    list-style: none;
-    padding: 0;
-  }
-  .posts li {
-    margin-bottom: 0.75em;
-  }
-  .posts a {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    text-decoration: none;
-    gap: 1em;
-  }
-  .post-title {
-    font-weight: 600;
-  }
-  .post-date {
-    color: rgb(var(--gray));
-    font-size: 0.85em;
-    white-space: nowrap;
-  }
-</style>
