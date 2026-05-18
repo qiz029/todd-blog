@@ -4,9 +4,6 @@ description: "Don't outsource your thinking to \"them\" — on independent thoug
 pubDate: 2026-05-17
 tags: ["philosophy", "science", "critical-thinking", "intellectual-honesty", "amateur-science"]
 ---
-
-# With Scientific Rigor, with an Amateur's Spirit
-
 ## Don't Outsource Your Thinking to "Them"
 
 I really hate hearing people say: "They must have their reasons."

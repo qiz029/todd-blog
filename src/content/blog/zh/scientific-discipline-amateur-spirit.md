@@ -4,9 +4,6 @@ description: '不要把思考交给"他们"——关于独立思考、质疑权�
 pubDate: 2026-05-17
 tags: ["philosophy", "science", "critical-thinking", "intellectual-honesty", "amateur-science"]
 ---
-
-# 以科学的态度，以民科的精神
-
 ## 不要把思考交给"他们"
 
 我非常讨厌听到别人的一句话："他们一定有他们的道理。"

@@ -4,9 +4,6 @@ description: "From WoW raid guilds to software engineering — idealists, steady
 pubDate: 2026-05-14
 tags: ["team-building", "world-of-warcraft", "software-engineering", "leadership", "ai"]
 ---
-
-# What Kind of People Make Up a Team?
-
 This is not an article about what a tech team looks like.
 
 I want to start by talking about what a World of Warcraft raid team looks like.
