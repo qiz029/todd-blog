@@ -18,6 +18,7 @@ const locale = Astro.currentLocale || 'en';
     <div class="internal-links">
       <HeaderLink href={getRelativeLocaleUrl(locale, '/')}>{t('nav.home', locale)}</HeaderLink>
       <HeaderLink href={getRelativeLocaleUrl(locale, '/blog')}>{t('nav.blog', locale)}</HeaderLink>
+      <HeaderLink href={getRelativeLocaleUrl(locale, '/projects')}>{t('nav.projects', locale)}</HeaderLink>
       <HeaderLink href={getRelativeLocaleUrl(locale, '/about')}>{t('nav.about', locale)}</HeaderLink>
       <LanguageSwitcher />
     </div>

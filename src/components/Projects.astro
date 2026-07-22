@@ -1,0 +1,126 @@
+---
+import { t } from '../i18n/translations';
+import { getRecentRepos } from '../lib/github';
+
+interface Props {
+  locale: string;
+}
+
+const { locale } = Astro.props;
+const repos = await getRecentRepos(5);
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+---
+
+<h2>{t('projects.featured', locale)}</h2>
+<a class="featured-card" href="https://paxtech.net" target="_blank" rel="noopener">
+  <div class="featured-head">
+    <span class="featured-name">Pax</span>
+    <span class="featured-url">paxtech.net</span>
+  </div>
+  <p class="featured-desc">{t('projects.pax.desc', locale)}</p>
+</a>
+
+<hr />
+
+<h2>{t('projects.recent', locale)}</h2>
+{
+  repos.length > 0 ? (
+    <ul class="repo-list">
+      {repos.map((repo) => (
+        <li class="repo">
+          <div class="repo-main">
+            <a href={repo.url} target="_blank" rel="noopener" class="repo-name">
+              {repo.name}
+            </a>
+            {repo.description && <span class="repo-desc">{repo.description}</span>}
+          </div>
+          <div class="repo-meta">
+            {repo.language && <span>{repo.language}</span>}
+            <span>★ {repo.stars}</span>
+            <span>
+              {t('projects.updated', locale)} {formatDate(repo.pushedAt)}
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p set:html={t('projects.fallback', locale)} />
+  )
+}
+
+<style>
+  .featured-card {
+    display: block;
+    padding: 1em 1.25em;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: background 0.15s ease;
+  }
+  .featured-card:hover {
+    background: var(--bg-card-hover);
+  }
+  .featured-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75em;
+  }
+  .featured-name {
+    font-weight: 700;
+    font-size: 1.15em;
+    color: var(--text);
+  }
+  .featured-url {
+    font-size: 0.8em;
+    color: var(--text-muted);
+  }
+  .featured-desc {
+    margin: 0.5em 0 0 0;
+    font-size: 0.9em;
+    color: var(--text-muted);
+  }
+  hr {
+    margin: 2.5em 0;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+  .repo-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .repo {
+    padding: 0.75em 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .repo:last-child {
+    border-bottom: none;
+  }
+  .repo-main {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75em;
+    flex-wrap: wrap;
+  }
+  .repo-name {
+    font-weight: 700;
+  }
+  .repo-desc {
+    font-size: 0.85em;
+    color: var(--text-muted);
+  }
+  .repo-meta {
+    display: flex;
+    gap: 1.25em;
+    margin-top: 0.25em;
+    font-size: 0.75em;
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,17 @@
+# Triggers a Cloudflare Pages rebuild once a day so the GitHub repo data
+# on /projects stays fresh (repo list is fetched at build time).
+name: Scheduled rebuild
+
+on:
+  schedule:
+    - cron: '23 15 * * *' # daily, 15:23 UTC
+  workflow_dispatch: # allow manual runs from the Actions tab
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages deploy hook
+        run: curl -fsS -X POST "$CLOUDFLARE_DEPLOY_HOOK_URL"
+        env:
+          CLOUDFLARE_DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}

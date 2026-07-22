@@ -6,6 +6,7 @@ const dict: Record<string, Record<string, string>> = {
   'nav.home':       { en: 'Home',       zh: '首页' },
   'nav.blog':       { en: 'Blog',       zh: '文章' },
   'nav.about':      { en: 'About',      zh: '关于' },
+  'nav.projects':   { en: 'Projects',   zh: '项目' },
 
   // Home page
   'home.heading':   { en: 'Todd Zheng', zh: 'Todd Zheng' },
@@ -93,6 +94,20 @@ const dict: Record<string, Record<string, string>> = {
 
   // Blog post layout
   'blog.updated': { en: 'Last updated on', zh: '最后更新于' },
+
+  // Projects page
+  'projects.heading':  { en: 'Projects',       zh: '项目' },
+  'projects.featured': { en: 'Featured',       zh: '精选' },
+  'projects.recent':   { en: 'Recently updated on GitHub', zh: 'GitHub 最近更新' },
+  'projects.pax.desc': {
+    en: 'Agent collaboration platform — see what your agents are doing, let them pass context directly to each other, and keep human approvals where risk starts.',
+    zh: 'Agent 协作平台——看清你的 Agent 在做什么，让它们之间直接传递上下文，并把人工审批留在风险发生的地方。',
+  },
+  'projects.updated':  { en: 'updated', zh: '更新于' },
+  'projects.fallback': {
+    en: 'GitHub data was unavailable at build time. See <a href="https://github.com/qiz029">github.com/qiz029</a>.',
+    zh: '构建时未能获取 GitHub 数据，请访问 <a href="https://github.com/qiz029">github.com/qiz029</a>。',
+  },
 };
 
 export function t(key: string, locale?: string): string {
