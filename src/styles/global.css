@@ -15,14 +15,19 @@ body {
   margin: 0;
   padding: 0;
   text-align: left;
-  background: var(--bg);
+  background-color: var(--bg);
+  /* Faint grid so wide viewports don't read as empty void */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 48px 48px;
   color: var(--text);
   font-size: 19px;
   line-height: 1.7;
 }
 
 main {
-  width: 720px;
+  width: 800px;
   max-width: calc(100% - 2em);
   margin: auto;
   padding: 3em 1em;
