@@ -17,8 +17,14 @@ const formatDate = (iso: string) =>
   });
 ---
 
-<h2>{t('projects.featured', locale)}</h2>
-<a class="featured-card" href="https://paxtech.net" target="_blank" rel="noopener">
+<h2 class="animate-in">{t('projects.featured', locale)}</h2>
+<a
+  class="featured-card animate-in"
+  style="animation-delay: 0.1s"
+  href="https://paxtech.net"
+  target="_blank"
+  rel="noopener"
+>
   <div class="featured-head">
     <span class="featured-name">Pax</span>
     <span class="featured-url">paxtech.net</span>
@@ -28,12 +34,12 @@ const formatDate = (iso: string) =>
 
 <hr />
 
-<h2>{t('projects.recent', locale)}</h2>
+<h2 class="animate-in" style="animation-delay: 0.2s">{t('projects.recent', locale)}</h2>
 {
   repos.length > 0 ? (
     <ul class="repo-list">
-      {repos.map((repo) => (
-        <li class="repo">
+      {repos.map((repo, i) => (
+        <li class="repo animate-in" style={`animation-delay: ${0.3 + i * 0.06}s`}>
           <div class="repo-main">
             <a href={repo.url} target="_blank" rel="noopener" class="repo-name">
               {repo.name}
@@ -43,6 +49,9 @@ const formatDate = (iso: string) =>
           <div class="repo-meta">
             {repo.language && <span>{repo.language}</span>}
             <span>★ {repo.stars}</span>
+            {repo.weeklyCommits > 0 && (
+              <span>{t('projects.weekly', locale).replace('{n}', String(repo.weeklyCommits))}</span>
+            )}
             <span>
               {t('projects.updated', locale)} {formatDate(repo.pushedAt)}
             </span>
@@ -62,10 +71,12 @@ const formatDate = (iso: string) =>
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, border-color 0.25s ease, transform 0.2s ease;
   }
   .featured-card:hover {
     background: var(--bg-card-hover);
+    border-color: var(--accent);
+    transform: translateY(-2px);
   }
   .featured-head {
     display: flex;
@@ -122,5 +133,6 @@ const formatDate = (iso: string) =>
     margin-top: 0.25em;
     font-size: 0.75em;
     color: var(--text-muted);
+    font-family: var(--font-jetbrains), monospace;
   }
 </style>

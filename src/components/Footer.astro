@@ -37,9 +37,16 @@ const { locale } = Astro.props;
   .links a {
     color: var(--text-muted);
     text-decoration: none;
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    padding-bottom: 2px;
+    transition: background-size 0.3s ease, color 0.2s ease;
   }
   .links a:hover {
     color: var(--accent);
+    background-size: 100% 1px;
   }
   @media (max-width: 720px) {
     .footer-content {

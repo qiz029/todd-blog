@@ -38,12 +38,28 @@ const sortedPosts = posts
         font-size: 2.8em;
         margin-bottom: 0.25em;
         letter-spacing: -0.02em;
+        animation: rise 0.5s ease-out 0.9s both;
       }
       .hero .sub {
         color: var(--text-muted);
         font-size: 1.1em;
         max-width: 560px;
         line-height: 1.6;
+        animation: rise 0.5s ease-out 1.15s both;
+      }
+      .hero-term {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.85em;
+        color: var(--text-muted);
+        margin-bottom: 1em;
+      }
+      .hero-term .prompt {
+        color: var(--accent);
+        margin-right: 0.5em;
+      }
+      .hero-term .cursor {
+        color: var(--accent-amber);
+        animation: blink 1.1s step-end infinite;
       }
       .hero .sub em {
         color: var(--accent-amber);
@@ -99,6 +115,7 @@ const sortedPosts = posts
         font-weight: 600;
         color: var(--text);
         margin-bottom: 0.2em;
+        transition: color 0.2s ease;
       }
       .post-desc {
         font-size: 0.9em;
@@ -109,7 +126,7 @@ const sortedPosts = posts
       .post-date {
         font-size: 0.8em;
         color: var(--text-muted);
-        font-family: monospace;
+        font-family: var(--font-jetbrains), monospace;
       }
       .post-card a:hover .post-title {
         color: var(--accent);
@@ -135,12 +152,15 @@ const sortedPosts = posts
           <span class="g2"></span>
           <span class="g3"></span>
         </div>
+        <div class="hero-term" aria-hidden="true">
+          <span class="prompt">~ $</span><span id="term-cmd">whoami</span><span class="cursor">▌</span>
+        </div>
         <h1>{t('home.heading', locale)}</h1>
         <p class="sub">{t('home.intro', locale)}</p>
       </section>
 
       <section>
-        <div class="posts-header">
+        <div class="posts-header animate-in" style="animation-delay: 1.3s">
           <h2>{t('home.writing', locale)}</h2>
           <hr />
         </div>
@@ -149,8 +169,8 @@ const sortedPosts = posts
             <p class="empty">{t('home.empty', locale)}</p>
           ) : (
             <ul class="post-list">
-              {sortedPosts.map((post) => (
-                <li class="post-card">
+              {sortedPosts.map((post, i) => (
+                <li class="post-card animate-in" style={`animation-delay: ${1.4 + i * 0.06}s`}>
                   <a href={`/${locale}/blog/${post.id.replace(locale + '/', '')}`}>
                     <div class="post-title">{post.data.title}</div>
                     {post.data.description && <div class="post-desc">{post.data.description}</div>}
@@ -170,5 +190,24 @@ const sortedPosts = posts
       </section>
     </main>
     <Footer locale={locale} />
+    <script>
+      // Terminal-style typewriter for the hero. Re-runs on every page load
+      // (including ClientRouter navigations) via astro:page-load.
+      document.addEventListener('astro:page-load', () => {
+        const cmd = document.getElementById('term-cmd');
+        if (!cmd) return;
+        const text = 'whoami';
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          cmd.textContent = text;
+          return;
+        }
+        cmd.textContent = '';
+        let i = 0;
+        const timer = setInterval(() => {
+          cmd.textContent = text.slice(0, ++i);
+          if (i >= text.length) clearInterval(timer);
+        }, 90);
+      });
+    </script>
   </body>
 </html>

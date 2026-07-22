@@ -41,23 +41,38 @@ export default defineConfig({
 	fonts: [
 		{
 			provider: fontProviders.local(),
-			name: 'Atkinson',
-			cssVariable: '--font-atkinson',
-			fallbacks: ['sans-serif'],
+			name: 'Inter',
+			cssVariable: '--font-inter',
+			fallbacks: ['-apple-system', 'PingFang SC', 'Noto Sans SC', 'sans-serif'],
 			options: {
 				variants: [
-					{
-						src: ['./src/assets/fonts/atkinson-regular.woff'],
-						weight: 400,
-						style: 'normal',
-						display: 'swap',
-					},
-					{
-						src: ['./src/assets/fonts/atkinson-bold.woff'],
-						weight: 700,
-						style: 'normal',
-						display: 'swap',
-					},
+					{ src: ['./src/assets/fonts/inter-400-normal.woff2'], weight: 400, style: 'normal', display: 'swap' },
+					{ src: ['./src/assets/fonts/inter-600-normal.woff2'], weight: 600, style: 'normal', display: 'swap' },
+					{ src: ['./src/assets/fonts/inter-700-normal.woff2'], weight: 700, style: 'normal', display: 'swap' },
+				],
+			},
+		},
+		{
+			provider: fontProviders.local(),
+			name: 'Space Grotesk',
+			cssVariable: '--font-space-grotesk',
+			fallbacks: ['-apple-system', 'PingFang SC', 'Noto Sans SC', 'sans-serif'],
+			options: {
+				variants: [
+					{ src: ['./src/assets/fonts/space-grotesk-500-normal.woff2'], weight: 500, style: 'normal', display: 'swap' },
+					{ src: ['./src/assets/fonts/space-grotesk-700-normal.woff2'], weight: 700, style: 'normal', display: 'swap' },
+				],
+			},
+		},
+		{
+			provider: fontProviders.local(),
+			name: 'JetBrains Mono',
+			cssVariable: '--font-jetbrains',
+			fallbacks: ['monospace'],
+			options: {
+				variants: [
+					{ src: ['./src/assets/fonts/jetbrains-mono-400-normal.woff2'], weight: 400, style: 'normal', display: 'swap' },
+					{ src: ['./src/assets/fonts/jetbrains-mono-500-normal.woff2'], weight: 500, style: 'normal', display: 'swap' },
 				],
 			},
 		},
