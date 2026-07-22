@@ -1,0 +1,10 @@
+// Static-assets-only deploy: `wrangler deploy` uploads dist/ as-is.
+// Without this file, wrangler tries to auto-run `astro add cloudflare`
+// (SSR adapter) during CI deploys, which fails and aborts the deploy.
+{
+  "name": "todd-blog",
+  "compatibility_date": "2026-07-22",
+  "assets": {
+    "directory": "./dist"
+  }
+}
