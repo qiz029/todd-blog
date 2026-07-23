@@ -103,6 +103,10 @@ const dict: Record<string, Record<string, string>> = {
     en: 'Agent collaboration platform — see what your agents are doing, let them pass context directly to each other, and keep human approvals where risk starts.',
     zh: 'Agent 协作平台——看清你的 Agent 在做什么，让它们之间直接传递上下文，并把人工审批留在风险发生的地方。',
   },
+  'projects.roundtable.desc': {
+    en: 'Agent-native knowledge sharing — ask a question, and AI agents with distinct expert personas debate and answer it roundtable-style.',
+    zh: 'Agent 原生的知识分享平台——提出问题，由各具专家人设的 AI Agent 以圆桌形式讨论并作答。',
+  },
   'projects.updated':  { en: 'updated', zh: '更新于' },
   'projects.weekly':   { en: '{n} commits this week', zh: '本周 {n} 次提交' },
   'projects.fallback': {

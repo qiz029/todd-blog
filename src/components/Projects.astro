@@ -1,4 +1,7 @@
 ---
+import { Image } from 'astro:assets';
+import paxPreview from '../assets/paxtech-preview.png';
+import roundtablePreview from '../assets/roundtable-preview.png';
 import { t } from '../i18n/translations';
 import { getRecentRepos } from '../lib/github';
 
@@ -9,6 +12,21 @@ interface Props {
 const { locale } = Astro.props;
 const repos = await getRecentRepos(5);
 
+const featured = [
+  {
+    name: 'Pax',
+    url: 'https://paxtech.net',
+    image: paxPreview,
+    descKey: 'projects.pax.desc',
+  },
+  {
+    name: 'Roundtable',
+    url: 'https://roundtable.toddzheng.com',
+    image: roundtablePreview,
+    descKey: 'projects.roundtable.desc',
+  },
+];
+
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', {
     year: 'numeric',
@@ -18,19 +36,33 @@ const formatDate = (iso: string) =>
 ---
 
 <h2 class="animate-in">{t('projects.featured', locale)}</h2>
-<a
-  class="featured-card animate-in"
-  style="animation-delay: 0.1s"
-  href="https://paxtech.net"
-  target="_blank"
-  rel="noopener"
->
-  <div class="featured-head">
-    <span class="featured-name">Pax</span>
-    <span class="featured-url">paxtech.net</span>
-  </div>
-  <p class="featured-desc">{t('projects.pax.desc', locale)}</p>
-</a>
+<div class="featured-grid">
+  {
+    featured.map((project, i) => (
+      <a
+        class="featured-card animate-in"
+        style={`animation-delay: ${0.1 + i * 0.08}s`}
+        href={project.url}
+        target="_blank"
+        rel="noopener"
+      >
+        <Image
+          src={project.image}
+          alt={`${project.name} preview`}
+          class="featured-img"
+          width={800}
+        />
+        <div class="featured-body">
+          <div class="featured-head">
+            <span class="featured-name">{project.name}</span>
+            <span class="featured-url">{project.url.replace('https://', '')}</span>
+          </div>
+          <p class="featured-desc">{t(project.descKey, locale)}</p>
+        </div>
+      </a>
+    ))
+  }
+</div>
 
 <hr />
 
@@ -65,18 +97,41 @@ const formatDate = (iso: string) =>
 }
 
 <style>
+  .featured-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25em;
+  }
+  @media (max-width: 640px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+  }
   .featured-card {
     display: block;
-    padding: 1em 1.25em;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
+    overflow: hidden;
     transition: background 0.15s ease, border-color 0.25s ease, transform 0.2s ease;
   }
   .featured-card:hover {
     background: var(--bg-card-hover);
     border-color: var(--accent);
     transform: translateY(-2px);
+  }
+  .featured-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .featured-body {
+    padding: 1em 1.25em 1.25em;
   }
   .featured-head {
     display: flex;
