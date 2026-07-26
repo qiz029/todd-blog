@@ -112,9 +112,67 @@ hr {
   border-top: 1px solid var(--border);
 }
 
+/* Chinese paragraphs run shorter — tighten the vertical rhythm a bit */
+html:lang(zh-CN) .prose p { margin-bottom: 1.4em; }
+
+/* Heading anchor links (rehype-autolink-headings) */
+.prose .heading-anchor {
+  opacity: 0;
+  margin-left: 0.4em;
+  font-size: 0.75em;
+  color: var(--text-muted);
+  background: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h4:hover .heading-anchor,
+.prose .heading-anchor:focus {
+  opacity: 1;
+}
+.prose .heading-anchor:hover { color: var(--accent); }
+
+/* Code block toolbar (语言标签 + copy button, injected by BlogPost script) */
+pre { position: relative; }
+.code-tools {
+  position: absolute;
+  top: 0.5em;
+  right: 0.6em;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.72em;
+}
+.code-lang {
+  color: var(--text-muted);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+.code-copy {
+  background: var(--bg-card-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25em 0.7em;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+pre:hover .code-copy,
+.code-copy:focus {
+  opacity: 1;
+}
+.code-copy:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 @media (max-width: 720px) {
   body { font-size: 18px; }
   main { padding: 1em; }
+  .code-copy { opacity: 1; }
 }
 
 .sr-only {

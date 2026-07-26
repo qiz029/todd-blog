@@ -94,6 +94,22 @@ const dict: Record<string, Record<string, string>> = {
 
   // Blog post layout
   'blog.updated': { en: 'Last updated on', zh: '最后更新于' },
+  'blog.readingTime': { en: '{min} min read · {words} words', zh: '约 {min} 分钟 · {words} 字' },
+  'post.toc':      { en: 'On this page', zh: '本页目录' },
+  'post.share':    { en: 'Share',        zh: '分享' },
+  'post.copyLink': { en: 'Copy link',    zh: '复制链接' },
+  'post.copied':   { en: 'Copied!',      zh: '已复制' },
+  'post.readNext': { en: 'Read next',    zh: '接着读' },
+  'post.older':    { en: 'Older',        zh: '上一篇' },
+  'post.newer':    { en: 'Newer',        zh: '下一篇' },
+  'post.authorBio': {
+    en: 'Senior software engineer & tech lead. I write about AI engineering, developer tooling, and the messy parts of building software at scale.',
+    zh: '资深软件工程师 & 技术负责人。写 AI 工程、开发者工具，以及规模化软件建设中那些混乱的部分。',
+  },
+
+  // Tags
+  'tags.heading': { en: 'Tags', zh: '标签' },
+  'tags.allTags': { en: 'All tags', zh: '全部标签' },
 
   // Projects page
   'projects.heading':  { en: 'Projects',       zh: '项目' },

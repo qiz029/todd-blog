@@ -5,6 +5,8 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 // https://astro.build/config
 export default defineConfig({
@@ -34,7 +36,18 @@ export default defineConfig({
 	},
 	markdown: {
 		remarkPlugins: [remarkMath],
-		rehypePlugins: [rehypeKatex],
+		rehypePlugins: [
+			rehypeKatex,
+			rehypeSlug,
+			[
+				rehypeAutolinkHeadings,
+				{
+					behavior: 'append',
+					properties: { className: ['heading-anchor'], ariaHidden: 'true', tabIndex: -1 },
+					content: { type: 'text', value: '#' },
+				},
+			],
+		],
 		shikiConfig: {
 			theme: 'github-dark',
 			wrap: true,

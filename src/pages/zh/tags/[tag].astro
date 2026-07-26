@@ -5,6 +5,7 @@ import Footer from '../../../components/Footer.astro';
 import FormattedDate from '../../../components/FormattedDate.astro';
 import Header from '../../../components/Header.astro';
 import { SITE_TITLE } from '../../../consts';
+import { t } from '../../../i18n/translations';
 
 export async function getStaticPaths() {
   const locale = 'zh';
@@ -68,6 +69,14 @@ const { posts } = Astro.props;
       }
       .post-link:hover .post-title { color: var(--accent); }
       h1 .hash { color: var(--accent); }
+      .back {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.85em;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .back:hover { color: var(--accent); }
       @media (max-width: 720px) {
         .post-link:hover { padding-left: 0.5em; }
       }
@@ -76,6 +85,7 @@ const { posts } = Astro.props;
   <body>
     <Header />
     <main>
+      <p class="animate-in"><a class="back" href={`/${locale}/tags/`}>← {t('tags.allTags', locale)}</a></p>
       <h1 class="animate-in"><span class="hash">#</span>{tag}</h1>
       <ul class="post-list stagger">
         {posts.map((post) => (

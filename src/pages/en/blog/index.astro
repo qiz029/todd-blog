@@ -5,35 +5,70 @@ import Footer from '../../../components/Footer.astro';
 import FormattedDate from '../../../components/FormattedDate.astro';
 import Header from '../../../components/Header.astro';
 import { SITE_TITLE } from '../../../consts';
+import { t } from '../../../i18n/translations';
+import { localePosts, postUrl } from '../../../lib/blog';
 
 const locale = Astro.currentLocale || 'en';
-const posts = (await getCollection('blog', (entry) => entry.id.startsWith(locale + '/')))
-  .filter((p) => !p.data.draft)
-  .sort((a, b) => {
-    const dateDiff = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-    if (dateDiff !== 0) return dateDiff;
-    return b.id.localeCompare(a.id);
-  });
+const posts = localePosts(await getCollection('blog'), locale);
+
+// Group by publication year, newest year first (posts already sorted desc).
+const byYear: [number, typeof posts][] = [];
+for (const post of posts) {
+  const year = post.data.pubDate.getFullYear();
+  const last = byYear[byYear.length - 1];
+  if (last && last[0] === year) last[1].push(post);
+  else byYear.push([year, [post]]);
+}
 ---
 
 <!doctype html>
 <html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
   <head>
-    <BaseHead title={`Blog — ${SITE_TITLE}`} />
+    <BaseHead title={`${t('nav.blog', locale)} — ${SITE_TITLE}`} />
     <style>
-      .post-list { list-style: none; margin: 0; padding: 0; }
-      .post-item { margin-bottom: 0; }
-      .post-link {
-        display: block;
-        padding: 1.2em 0;
-        border-bottom: 1px solid var(--border);
-        text-decoration: none;
-        transition: padding-left 0.15s ease;
+      .blog-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1em;
+        flex-wrap: wrap;
       }
-      .post-item:first-child .post-link { border-top: 1px solid var(--border); }
-      .post-link:hover {
+      .all-tags {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.85em;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .all-tags:hover { color: var(--accent); }
+      .year-group { margin-top: 2.5em; }
+      .year-header {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        margin-bottom: 0.5em;
+      }
+      .year-header h2 {
+        margin: 0;
+        font-size: 1em;
+        font-family: var(--font-jetbrains), monospace;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+      }
+      .year-header hr { flex: 1; margin: 0; }
+      .post-list { list-style: none; margin: 0; padding: 0; }
+      .post-item {
+        border-bottom: 1px solid var(--border);
+        padding: 1.2em 0;
+        transition: padding-left 0.15s ease, border-color 0.15s ease;
+      }
+      .post-item:hover {
         padding-left: 1em;
         border-bottom-color: var(--accent);
+      }
+      .post-link {
+        display: block;
+        text-decoration: none;
       }
       .post-title {
         margin: 0 0 0.25rem 0;
@@ -55,27 +90,65 @@ const posts = (await getCollection('blog', (entry) => entry.id.startsWith(locale
         font-size: 0.8em;
         font-family: var(--font-jetbrains), monospace;
       }
-      .post-link:hover .post-title { color: var(--accent); }
+      .post-item:hover .post-title { color: var(--accent); }
+      .item-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        margin: 0.6em 0 0 0;
+      }
+      .item-tags a {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.72em;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.15em 0.5em;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        transition: color 0.2s ease, border-color 0.2s ease;
+      }
+      .item-tags a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
       @media (max-width: 720px) {
-        .post-link:hover { padding-left: 0.5em; }
+        .post-item:hover { padding-left: 0.5em; }
       }
     </style>
   </head>
   <body>
     <Header />
     <main>
-      <h1 class="animate-in">Blog</h1>
-      <ul class="post-list stagger">
-        {posts.map((post) => (
-          <li class="post-item">
-            <a class="post-link" href={`/${locale}/blog/${post.id.replace(locale + '/', '')}`}>
-              <h3 class="post-title">{post.data.title}</h3>
-              {post.data.description && <p class="post-desc">{post.data.description}</p>}
-              <p class="post-date"><FormattedDate date={post.data.pubDate} /></p>
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div class="blog-header animate-in">
+        <h1>{t('nav.blog', locale)}</h1>
+        <a class="all-tags" href={`/${locale}/tags/`}>#{t('tags.allTags', locale)} →</a>
+      </div>
+      {byYear.map(([year, list]) => (
+        <section class="year-group animate-in">
+          <div class="year-header">
+            <h2>{year}</h2>
+            <hr />
+          </div>
+          <ul class="post-list stagger">
+            {list.map((post) => (
+              <li class="post-item">
+                <a class="post-link" href={postUrl(post, locale)}>
+                  <h3 class="post-title">{post.data.title}</h3>
+                  {post.data.description && <p class="post-desc">{post.data.description}</p>}
+                  <p class="post-date"><FormattedDate date={post.data.pubDate} /></p>
+                </a>
+                {post.data.tags.length > 0 && (
+                  <div class="item-tags">
+                    {post.data.tags.map((tag) => (
+                      <a href={`/${locale}/tags/${tag}/`}>#{tag}</a>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </main>
     <Footer locale={locale} />
   </body>

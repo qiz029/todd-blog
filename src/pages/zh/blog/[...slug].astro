@@ -1,10 +1,14 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../../layouts/BlogPost.astro';
+import { localePosts, postNav, postUrl, readingStats } from '../../../lib/blog';
 
 export async function getStaticPaths() {
   const locale = 'zh';
-  const posts = await getCollection('blog', (entry) => entry.id.startsWith(locale + '/'));
+  const posts = await getCollection(
+    'blog',
+    (entry) => entry.id.startsWith(locale + '/') && !entry.data.draft
+  );
   return posts.map((post) => ({
     params: { slug: post.id.replace(locale + '/', '') },
     props: post,
@@ -12,10 +16,28 @@ export async function getStaticPaths() {
 }
 type Props = CollectionEntry<'blog'>;
 
+const locale = 'zh';
 const post = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+
+const sorted = localePosts(await getCollection('blog'), locale);
+const { older, newer, related } = postNav(sorted, post);
+const toLink = (p: CollectionEntry<'blog'>) => ({
+  title: p.data.title,
+  href: postUrl(p, locale),
+  description: p.data.description,
+});
 ---
 
-<BlogPost {...post.data} id={post.id} locale="zh">
+<BlogPost
+  {...post.data}
+  id={post.id}
+  locale={locale}
+  headings={headings}
+  stats={readingStats(post.body ?? '')}
+  older={older && toLink(older)}
+  newer={newer && toLink(newer)}
+  related={related.map(toLink)}
+>
   <Content />
 </BlogPost>

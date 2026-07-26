@@ -1,17 +1,72 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import { AUTHOR_NAME } from '../consts';
 import { t } from '../i18n/translations';
 import 'katex/dist/katex.min.css';
 
-type Props = CollectionEntry<'blog'>['data'] & { id: string; locale?: string };
+interface PostLink {
+  title: string;
+  href: string;
+  description?: string;
+}
 
-const { id, title, description, pubDate, updatedDate, heroImage, tags = [], locale = 'en' } =
-  Astro.props;
+type Props = CollectionEntry<'blog'>['data'] & {
+  id: string;
+  locale?: string;
+  headings?: MarkdownHeading[];
+  stats?: { minutes: number; words: number };
+  older?: PostLink;
+  newer?: PostLink;
+  related?: PostLink[];
+};
+
+const {
+  id,
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  tags = [],
+  locale = 'en',
+  headings = [],
+  stats,
+  older,
+  newer,
+  related = [],
+} = Astro.props;
+
+// Astro extracts heading text after rehype-autolink-headings appends its '#' — strip it.
+const tocHeadings = headings
+  .filter((h) => h.depth >= 2 && h.depth <= 3)
+  .map((h) => ({ ...h, text: h.text.replace(/\s*#\s*$/, '') }));
+const readingTime = stats
+  ? t('blog.readingTime', locale)
+      .replace('{min}', String(stats.minutes))
+      .replace('{words}', stats.words.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US'))
+  : undefined;
+
+const shareURL = new URL(Astro.url.pathname, Astro.site).toString();
+const shareLinks = [
+  {
+    label: 'X',
+    href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareURL)}`,
+  },
+  {
+    label: 'HN',
+    href: `https://news.ycombinator.com/submitlink?u=${encodeURIComponent(shareURL)}&t=${encodeURIComponent(title)}`,
+  },
+  {
+    label: 'LinkedIn',
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareURL)}`,
+  },
+];
 ---
 
 <html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
@@ -36,6 +91,10 @@ const { id, title, description, pubDate, updatedDate, heroImage, tags = [], loca
         margin: 0 auto;
         border-radius: 4px;
       }
+      .post-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
       .prose {
         width: 800px;
         max-width: calc(100% - 2em);
@@ -52,6 +111,10 @@ const { id, title, description, pubDate, updatedDate, heroImage, tags = [], loca
       .title h1 {
         margin: 0 0 0.5em 0;
         color: var(--text);
+      }
+      .title h1.zh {
+        font-size: 2.5em;
+        line-height: 1.25;
       }
       .date {
         margin-bottom: 0.5em;
@@ -86,6 +149,223 @@ const { id, title, description, pubDate, updatedDate, heroImage, tags = [], loca
         color: var(--accent);
         border-color: var(--accent);
       }
+
+      /* ── Table of contents (wide screens only) ── */
+      .toc {
+        display: none;
+      }
+      @media (min-width: 1220px) {
+        .post-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 800px) minmax(0, 1fr);
+          column-gap: 1em;
+        }
+        .post-grid > .prose {
+          grid-column: 2;
+        }
+        .toc {
+          display: block;
+          grid-column: 3;
+          justify-self: start;
+        }
+        .toc-inner {
+          position: sticky;
+          top: 5em;
+          max-width: 250px;
+          padding: 1.5em 0 1.5em 1.25em;
+          border-left: 1px solid var(--border);
+          font-size: 0.82em;
+        }
+        .toc-title {
+          font-family: var(--font-jetbrains), monospace;
+          font-size: 0.8em;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--text-muted);
+          margin-bottom: 1em;
+        }
+        .toc ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        .toc li {
+          margin: 0.55em 0;
+          line-height: 1.4;
+        }
+        .toc li.d3 {
+          padding-left: 1em;
+        }
+        .toc a {
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color 0.15s ease;
+        }
+        .toc a:hover {
+          color: var(--text);
+        }
+        .toc a.active {
+          color: var(--accent);
+        }
+      }
+
+      /* ── Post footer: share / author / read next / nav ── */
+      .post-footer {
+        margin-top: 4em;
+      }
+      .share {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.6em;
+        padding-top: 1.5em;
+        border-top: 1px solid var(--border);
+      }
+      .share-label {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-right: 0.4em;
+      }
+      .share a,
+      .share button {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.8em;
+        color: var(--text-muted);
+        background: none;
+        text-decoration: none;
+        padding: 0.35em 0.8em;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: color 0.2s ease, border-color 0.2s ease;
+      }
+      .share a:hover,
+      .share button:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .author-card {
+        display: flex;
+        gap: 1.25em;
+        align-items: flex-start;
+        margin-top: 2em;
+        padding: 1.5em;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+      .avatar {
+        flex-shrink: 0;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-family: var(--font-space-grotesk);
+        font-weight: 700;
+        font-size: 1.4em;
+        color: var(--accent);
+        letter-spacing: -0.03em;
+      }
+      .author-name {
+        font-family: var(--font-space-grotesk);
+        font-weight: 700;
+        margin-bottom: 0.3em;
+      }
+      .author-bio {
+        margin: 0 0 0.6em 0;
+        color: var(--text-muted);
+        font-size: 0.88em;
+        line-height: 1.6;
+      }
+      .author-links {
+        display: flex;
+        gap: 1.2em;
+        font-size: 0.82em;
+        font-family: var(--font-jetbrains), monospace;
+      }
+      .read-next {
+        margin-top: 2.5em;
+      }
+      .read-next h2 {
+        font-size: 1em;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 0.8em;
+      }
+      .read-next ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .read-next a {
+        display: block;
+        padding: 0.9em 0;
+        border-bottom: 1px solid var(--border);
+        text-decoration: none;
+        transition: padding-left 0.15s ease;
+      }
+      .read-next a:first-child,
+      .read-next li:first-child a {
+        border-top: 1px solid var(--border);
+      }
+      .read-next a:hover {
+        padding-left: 0.8em;
+        border-bottom-color: var(--accent);
+      }
+      .read-next .rn-title {
+        color: var(--text);
+        font-weight: 600;
+        margin-bottom: 0.15em;
+      }
+      .read-next .rn-desc {
+        color: var(--text-muted);
+        font-size: 0.85em;
+        line-height: 1.5;
+      }
+      .post-nav {
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+        margin-top: 2.5em;
+      }
+      .post-nav a {
+        display: block;
+        max-width: 46%;
+        text-decoration: none;
+        color: var(--text-muted);
+        transition: color 0.2s ease;
+      }
+      .post-nav a:hover {
+        color: var(--accent);
+      }
+      .post-nav .dir {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.75em;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        display: block;
+        margin-bottom: 0.3em;
+      }
+      .post-nav .pn-title {
+        color: var(--text);
+        font-size: 0.92em;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .post-nav .newer {
+        text-align: right;
+        margin-left: auto;
+      }
+      .post-nav a:hover .pn-title {
+        color: var(--accent);
+      }
     </style>
   </head>
 
@@ -98,32 +378,182 @@ const { id, title, description, pubDate, updatedDate, heroImage, tags = [], loca
             <Image width={1020} height={510} src={heroImage} alt={title} />
           </div>
         )}
-        <div class="prose">
-          <div class="title">
-            <div class="date">
-              <FormattedDate date={pubDate} />
-              {
-                updatedDate && (
-                  <div class="last-updated-on">
-                    {t('blog.updated', locale)} <FormattedDate date={updatedDate} />
-                  </div>
-                )
-              }
-            </div>
-            <h1>{title}</h1>
-            {tags.length > 0 && (
-              <div class="tags">
-                {tags.map((tag) => (
-                  <a href={`/${locale}/tags/${tag}/`}>#{tag}</a>
-                ))}
+        <div class="post-grid">
+          <div class="prose">
+            <div class="title">
+              <div class="date">
+                <FormattedDate date={pubDate} />
+                {readingTime && <span> · {readingTime}</span>}
+                {
+                  updatedDate && (
+                    <div class="last-updated-on">
+                      {t('blog.updated', locale)} <FormattedDate date={updatedDate} />
+                    </div>
+                  )
+                }
               </div>
-            )}
-            <hr />
+              <h1 class:list={[locale === 'zh' && 'zh']}>{title}</h1>
+              {tags.length > 0 && (
+                <div class="tags">
+                  {tags.map((tag) => (
+                    <a href={`/${locale}/tags/${tag}/`}>#{tag}</a>
+                  ))}
+                </div>
+              )}
+              <hr />
+            </div>
+            <slot />
+
+            <div class="post-footer">
+              <div class="share">
+                <span class="share-label">{t('post.share', locale)}</span>
+                {shareLinks.map((link) => (
+                  <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+                ))}
+                <button
+                  type="button"
+                  class="share-copy"
+                  data-copied={t('post.copied', locale)}
+                >{t('post.copyLink', locale)}</button>
+              </div>
+
+              <div class="author-card">
+                <div class="avatar" aria-hidden="true">TZ</div>
+                <div>
+                  <div class="author-name">{AUTHOR_NAME}</div>
+                  <p class="author-bio">{t('post.authorBio', locale)}</p>
+                  <div class="author-links">
+                    <a href="https://github.com/qiz029">GitHub</a>
+                    <a href="https://www.linkedin.com/in/toddzheng-024">LinkedIn</a>
+                    <a href={`/${locale}/rss.xml`}>RSS</a>
+                  </div>
+                </div>
+              </div>
+
+              {related.length > 0 && (
+                <div class="read-next">
+                  <h2>{t('post.readNext', locale)}</h2>
+                  <ul>
+                    {related.map((link) => (
+                      <li>
+                        <a href={link.href}>
+                          <div class="rn-title">{link.title}</div>
+                          {link.description && <div class="rn-desc">{link.description}</div>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(older || newer) && (
+                <nav class="post-nav">
+                  {older && (
+                    <a href={older.href} class="older">
+                      <span class="dir">← {t('post.older', locale)}</span>
+                      <span class="pn-title">{older.title}</span>
+                    </a>
+                  )}
+                  {newer && (
+                    <a href={newer.href} class="newer">
+                      <span class="dir">{t('post.newer', locale)} →</span>
+                      <span class="pn-title">{newer.title}</span>
+                    </a>
+                  )}
+                </nav>
+              )}
+            </div>
           </div>
-          <slot />
+
+          {tocHeadings.length >= 2 && (
+            <aside class="toc" aria-label={t('post.toc', locale)}>
+              <div class="toc-inner">
+                <div class="toc-title">{t('post.toc', locale)}</div>
+                <ul>
+                  {tocHeadings.map((h) => (
+                    <li class:list={[`d${h.depth}`]}>
+                      <a href={`#${h.slug}`}>{h.text}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          )}
         </div>
       </article>
     </main>
     <Footer locale={locale} />
+
+    <script>
+      function initPost() {
+        const zh = document.documentElement.lang.startsWith('zh');
+
+        // Code block toolbar: language label + copy button
+        document.querySelectorAll('.prose pre').forEach((pre) => {
+          if (pre.querySelector('.code-tools')) return;
+          const code = pre.querySelector('code');
+          if (!code) return;
+          const tools = document.createElement('div');
+          tools.className = 'code-tools';
+          const lang = pre.getAttribute('data-language');
+          if (lang && lang !== 'plaintext') {
+            const label = document.createElement('span');
+            label.className = 'code-lang';
+            label.textContent = lang;
+            tools.appendChild(label);
+          }
+          const btn = document.createElement('button');
+          btn.className = 'code-copy';
+          btn.type = 'button';
+          const idle = zh ? '复制' : 'Copy';
+          btn.textContent = idle;
+          btn.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(code.innerText);
+            btn.textContent = zh ? '已复制' : 'Copied';
+            setTimeout(() => (btn.textContent = idle), 1500);
+          });
+          tools.appendChild(btn);
+          pre.appendChild(tools);
+        });
+
+        // Copy-link button in the share row
+        const copyBtn = document.querySelector('.share-copy');
+        if (copyBtn instanceof HTMLElement && !copyBtn.dataset.ready) {
+          copyBtn.dataset.ready = 'true';
+          const idle = copyBtn.textContent;
+          copyBtn.addEventListener('click', async () => {
+            await navigator.clipboard.writeText(location.origin + location.pathname);
+            copyBtn.textContent = copyBtn.dataset.copied ?? idle;
+            setTimeout(() => (copyBtn.textContent = idle), 1500);
+          });
+        }
+
+        // TOC scroll spy
+        const w = window as typeof window & { __tocObserver?: IntersectionObserver };
+        w.__tocObserver?.disconnect();
+        const toc = document.querySelector('.toc');
+        if (!toc) return;
+        const links = new Map<string, Element>();
+        toc.querySelectorAll('a[href^="#"]').forEach((a) => {
+          links.set(decodeURIComponent(a.getAttribute('href')!.slice(1)), a);
+        });
+        const headings = [...document.querySelectorAll('.prose h2[id], .prose h3[id]')].filter(
+          (h) => links.has(h.id)
+        );
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              links.forEach((a) => a.classList.remove('active'));
+              links.get(entry.target.id)?.classList.add('active');
+            }
+          },
+          { rootMargin: '-10% 0px -75% 0px' }
+        );
+        headings.forEach((h) => observer.observe(h));
+        w.__tocObserver = observer;
+      }
+      document.addEventListener('astro:page-load', initPost);
+    </script>
   </body>
 </html>
