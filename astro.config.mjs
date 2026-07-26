@@ -10,6 +10,8 @@ import rehypeKatex from 'rehype-katex';
 export default defineConfig({
 	site: 'https://toddzheng.net',
 	integrations: [mdx(), sitemap({
+		// The bare root is a 301 to /en/ — keep it out of the sitemap.
+		filter: (page) => page !== 'https://toddzheng.net/',
 		i18n: {
 			defaultLocale: 'en',
 			locales: {

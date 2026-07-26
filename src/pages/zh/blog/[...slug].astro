@@ -16,6 +16,6 @@ const post = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BlogPost {...post.data} locale="zh">
+<BlogPost {...post.data} id={post.id} locale="zh">
   <Content />
 </BlogPost>

@@ -10,7 +10,7 @@ const { locale } = Astro.props;
     <div class="links">
       <a href="mailto:toddzheng024@gmail.com">Email</a>
       <a href="https://www.linkedin.com/in/toddzheng-024/" target="_blank">LinkedIn</a>
-      <a href="/rss.xml">RSS</a>
+      <a href={`/${locale || 'en'}/rss.xml`}>RSS</a>
     </div>
   </div>
 </footer>

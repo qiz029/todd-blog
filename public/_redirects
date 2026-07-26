@@ -1,0 +1,4 @@
+# Cloudflare Workers static assets redirects.
+# Real 301s instead of the meta-refresh fallback in src/pages/index.astro.
+/ /en/ 301
+/rss.xml /en/rss.xml 301

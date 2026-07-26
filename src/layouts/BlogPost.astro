@@ -6,16 +6,22 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { t } from '../i18n/translations';
+import 'katex/dist/katex.min.css';
 
-type Props = CollectionEntry<'blog'>['data'] & { locale?: string };
+type Props = CollectionEntry<'blog'>['data'] & { id: string; locale?: string };
 
-const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = Astro.props;
+const { id, title, description, pubDate, updatedDate, heroImage, tags = [], locale = 'en' } =
+  Astro.props;
 ---
 
 <html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
   <head>
-    <BaseHead title={title} description={description} />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3G4o74UQ6H6c8sBFk0MG5GY8s9mI/qMx4p0WX7m7Zx8" crossorigin="anonymous" />
+    <BaseHead
+      title={title}
+      description={description}
+      image={`/og/${id}.png`}
+      article={{ pubDate, updatedDate, tags }}
+    />
     <style>
       main {
         width: calc(100% - 2em);
@@ -59,6 +65,27 @@ const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = A
       .title hr {
         margin-top: 1.5em;
       }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5em;
+        margin-top: 1em;
+      }
+      .tags a {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.75em;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.25em 0.6em;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        transition: color 0.2s ease, border-color 0.2s ease;
+      }
+      .tags a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
     </style>
   </head>
 
@@ -68,7 +95,7 @@ const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = A
       <article>
         {heroImage && (
           <div class="hero-image">
-            <Image width={1020} height={510} src={heroImage} alt="" />
+            <Image width={1020} height={510} src={heroImage} alt={title} />
           </div>
         )}
         <div class="prose">
@@ -84,6 +111,13 @@ const { title, description, pubDate, updatedDate, heroImage, locale = 'en' } = A
               }
             </div>
             <h1>{title}</h1>
+            {tags.length > 0 && (
+              <div class="tags">
+                {tags.map((tag) => (
+                  <a href={`/${locale}/tags/${tag}/`}>#{tag}</a>
+                ))}
+              </div>
+            )}
             <hr />
           </div>
           <slot />
