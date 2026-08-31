@@ -61,3 +61,6 @@ Check out [our documentation](https://docs.astro.build) or jump into our [Discor
 ## Credit
 
 This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+
+## CMS
+GET /api then follow OpenAPI; never use a CLI. See cms/README.md.
