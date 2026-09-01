@@ -3,7 +3,7 @@ title: "The Spectrum"
 description: "From vague needs to concrete implementation, each person covers only part of the spectrum. AI shortens that distance and forces a choice between depth and breadth."
 pubDate: 2026-09-01
 updatedDate: 2026-09-01
-heroImage: "/media/01-spectrum-coverage-en-a525c630.png"
+heroImage: "https://toddzheng.net/media/01-spectrum-coverage-en-a525c630.png"
 tags: ["ai", "product", "software-engineering", "career"]
 ---
 
@@ -13,7 +13,7 @@ That may describe a real pain, but it is not yet a requirement, much less someth
 
 At the left end of the spectrum are human frustrations, problems, and desires. At the right end are concrete systems and implementations. Product, design, engineering, QA, and operations sit at different places in between. Each person can understand and handle a range, but few people cover the entire spectrum.
 
-![Different people cover overlapping ranges between a vague need and a concrete implementation](/media/01-spectrum-coverage-en-a525c630.png)
+![Different people cover overlapping ranges between a vague need and a concrete implementation](https://toddzheng.net/media/01-spectrum-coverage-en-a525c630.png)
 
 *Coverage must be continuous. Communication happens in the overlap.*
 
@@ -27,7 +27,7 @@ Moving from a vague need to a concrete implementation is not one translation. It
 
 Imagine giving each handoff a score between zero and one. This is not a performance rating for a team. It describes how much of what mattered in the previous stage was understood and carried into the next one. The final outcome comes from these effects compounding, not from averaging everyone’s work. Every step can look respectable on its own while surprisingly little survives the full journey.
 
-![A chain of deliverables gradually loses part of the original signal](/media/02-delivery-loss-en-fdbbac85.png)
+![A chain of deliverables gradually loses part of the original signal](https://toddzheng.net/media/02-delivery-loss-en-fdbbac85.png)
 
 *Passing every local review does not guarantee an effective product.*
 
@@ -47,7 +47,7 @@ AI changes the shape of each person’s ability as well. Product people can buil
 
 That does not make every position on the spectrum equally easy. AI gives people a broad layer of baseline capability. It can take them to places they could not previously reach, but it does not guarantee that they can perform well once they get there. Medical judgment, safety systems, complex architecture, and brand design may still need to be nearly perfect. Those positions still need specialists. Experience, taste, professional judgment, and the ability to bear responsibility determine the peak. AI expands the range of action, but it also makes genuine depth easier to see.
 
-![AI shortens the spectrum and widens individual coverage while specialist depth remains necessary](/media/03-ai-spectrum-en-0f71f0ba.png)
+![AI shortens the spectrum and widens individual coverage while specialist depth remains necessary](https://toddzheng.net/media/03-ai-spectrum-en-0f71f0ba.png)
 
 *The distance gets shorter and individual coverage gets wider. The peak still requires specialist depth.*
 
@@ -57,7 +57,7 @@ Even without AI, the model suggests two paths for personal growth. One is to go 
 
 The other path is to widen your range. You learn the language, judgment, and deliverables of adjacent roles. This creates more overlap, reduces translation and handoffs, and lets you move a vague problem much closer to a result on your own. The value is not that you know a little about everything. It is that you can connect sections that used to be disconnected.
 
-![Personal growth can focus on specialist depth or wider continuous coverage](/media/04-growth-paths-en-fb82fd27.png)
+![Personal growth can focus on specialist depth or wider continuous coverage](https://toddzheng.net/media/04-growth-paths-en-fb82fd27.png)
 
 *One direction raises the peak. The other widens the range.*
 
