@@ -11,7 +11,7 @@ const locale = 'en';
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`${t('about.heading', locale)} — ${SITE_TITLE}`} />
+    <BaseHead title={`${t('about.heading', locale)} — ${SITE_TITLE}`} description={t('about.meta', locale)} pageType="profile" />
   </head>
   <body>
     <Header />
@@ -29,6 +29,14 @@ const locale = 'en';
       <p set:html={t('about.ai1', locale)} />
       <p set:html={t('about.ai2', locale)} />
 
+      <h2>{t('about.building', locale)}</h2>
+      <p>{t('about.building.intro', locale)}</p>
+      <ul>
+        <li><strong><a href="https://paxtech.net" target="_blank" rel="noopener">Pax Tech</a></strong> — {t('about.building.pax', locale)}</li>
+        <li><strong><a href="https://dshpluginhub.ai" target="_blank" rel="noopener">DSH Plugin Hub</a></strong> — {t('about.building.pluginHub', locale)}</li>
+        <li><strong><a href="https://roundtable.toddzheng.com" target="_blank" rel="noopener">Roundtable</a></strong> — {t('about.building.roundtable', locale)}</li>
+      </ul>
+
       <h2>{t('about.tech', locale)}</h2>
       <ul>
         <li><strong>{t('about.tech.lang', locale)}</strong>: {t('about.tech.lang.v', locale)}</li>
@@ -45,6 +53,7 @@ const locale = 'en';
       <ul>
         <li><a href="https://github.com/qiz029">{t('about.gh', locale)}</a></li>
         <li><a href="https://www.linkedin.com/in/toddzheng-024">{t('about.li', locale)}</a></li>
+        <li><a href="https://x.com/ShiZheng24517">{t('about.x', locale)} — @ShiZheng24517</a></li>
         <li><a href="https://toddzheng.net/en/rss.xml">RSS</a></li>
       </ul>
     </main>

@@ -10,15 +10,35 @@ const dict: Record<string, Record<string, string>> = {
 
   // Home page
   'home.heading':   { en: 'Todd Zheng', zh: 'Todd Zheng' },
+  'home.metaTitle': { en: 'Todd Zheng — Engineer, Builder, Writer', zh: 'Todd Zheng — 工程师、产品构建者、写作者' },
+  'home.role':      { en: 'Engineer · Builder · Writer', zh: '工程师 · 产品构建者 · 写作者' },
   'home.intro': {
-    en: 'Senior software engineer and tech lead. I build AI-powered developer tools and release platforms. Founding engineer of TikTok Global E-Commerce\'s release platform, now used by ~4,000 engineers. Currently working on LLM agents for debugging, knowledge sharing, and release automation.',
-    zh: '资深软件工程师 & 技术负责人。专注 AI 工程工具、发布平台和研发效能。作为 TikTok 全球电商发布平台的 founding engineer，从零建设并推动组织迁移，目前服务约 4,000 名工程师。近期实践方向为 LLM Agent，应用于调试、知识共享和发布自动化。',
+    en: 'I build systems that help people and teams do complex work with less friction — from release platforms used by thousands of engineers to AI tools and independent products.',
+    zh: '我构建让个人和团队更轻松完成复杂工作的系统——从服务数千名工程师的发布平台，到 AI 工具和独立产品。',
   },
+  'home.cta.projects': { en: 'Explore my work', zh: '看看我的作品' },
+  'home.cta.writing':  { en: 'Read my thinking', zh: '阅读我的思考' },
+  'home.cta.contact':  { en: 'Work with me', zh: '和我合作' },
+  'home.proof.label':     { en: 'Selected outcomes', zh: '代表性成果' },
+  'home.proof.engineers': { en: 'engineers on the release platform', zh: '名工程师使用发布平台' },
+  'home.proof.services':  { en: 'services managed', zh: '个服务纳入管理' },
+  'home.proof.approvals': { en: 'fewer compliance approvals', zh: '合规审批量降低' },
+  'home.proof.repos':     { en: "repos in my developer agent's ownership area", zh: '个代码库纳入开发者 Agent 的负责范围' },
+  'home.building.kicker': { en: 'From platforms to products', zh: '从平台到产品' },
+  'home.building':        { en: "What I'm building", zh: '我正在构建' },
+  'home.building.intro':  { en: 'Independent products and experiments where I turn engineering ideas into things people can use.', zh: '把工程实践中的想法变成真正有人使用的独立产品和实验。' },
+  'home.allProjects':     { en: 'All projects', zh: '全部项目' },
+  'home.writing.kicker':  { en: 'Ideas from the work', zh: '来自实践的思考' },
   'home.writing':   { en: 'Writing',    zh: '文章' },
+  'home.allWriting': { en: 'All writing', zh: '全部文章' },
   'home.empty':     { en: 'Nothing here yet. Working on it.', zh: '还没有文章，正在建设中。' },
 
   // About page
   'about.heading':  { en: 'About',      zh: '关于' },
+  'about.meta': {
+    en: 'About Todd Zheng, an engineer and product builder working on AI agents, developer platforms, and independent software products.',
+    zh: '关于 Todd Zheng：专注 AI Agent、开发者平台和独立软件产品的工程师与产品构建者。',
+  },
   'about.p1': {
     en: "I'm Todd Zheng, a senior software engineer and tech lead based in Bothell, Washington. I work on AI engineering tools, release platforms, and developer productivity.",
     zh: '我是 Todd Zheng（郑秋石），资深软件工程师 & 技术负责人，现居美国华盛顿州 Bothell。我从事 AI 工程工具、发布平台和研发效能方面的工作。',
@@ -29,6 +49,23 @@ const dict: Record<string, Record<string, string>> = {
   },
   'about.what':     { en: 'What I do',  zh: '工作经历' },
   'about.ai':       { en: 'AI Engineering', zh: 'AI 工程' },
+  'about.building': { en: "What I'm building now", zh: '我正在构建' },
+  'about.building.intro': {
+    en: 'I use independent products to explore how software, AI, and better workflows can make specialized work easier:',
+    zh: '我通过独立产品探索如何用软件、AI 和更好的工作流，让专业工作变得更简单：',
+  },
+  'about.building.pax': {
+    en: 'conversion-focused websites, connected workflows, and practical AI systems for small businesses.',
+    zh: '面向小型企业的转化型网站、互联工作流和实用 AI 系统。',
+  },
+  'about.building.pluginHub': {
+    en: 'an independent registry for discovering, verifying, and installing DeepSeek Harness plugins and profiles.',
+    zh: '用于发现、验证和安装 DeepSeek Harness 插件与 Profiles 的独立注册中心。',
+  },
+  'about.building.roundtable': {
+    en: 'an experiment in agent-native knowledge sharing through structured, multi-perspective discussion.',
+    zh: '通过结构化、多视角讨论探索 Agent 原生知识共享。',
+  },
   'about.tech':     { en: 'Tech Stack', zh: '技术栈' },
   'about.outside':  { en: 'Outside of work', zh: '工作之外' },
   'about.site':     { en: 'About this site', zh: '关于本站' },
@@ -87,6 +124,7 @@ const dict: Record<string, Record<string, string>> = {
   // Elsewhere
   'about.gh':  { en: 'GitHub',    zh: 'GitHub' },
   'about.li':  { en: 'LinkedIn',  zh: 'LinkedIn' },
+  'about.x':   { en: 'X',         zh: 'X' },
   'about.rss': { en: 'RSS',       zh: 'RSS' },
 
   // Footer

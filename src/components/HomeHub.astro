@@ -1,0 +1,177 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { FEATURED_PROJECTS } from '../data/featuredProjects';
+import { t } from '../i18n/translations';
+
+interface Props {
+  locale: string;
+}
+
+const { locale } = Astro.props;
+const posts = await getCollection('blog', (entry) => entry.id.startsWith(`${locale}/`));
+const recentPosts = posts
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const proof = [
+  ['~4,000', 'home.proof.engineers'],
+  ['~5,000', 'home.proof.services'],
+  ['~80%', 'home.proof.approvals'],
+  ['~20', 'home.proof.repos'],
+];
+---
+
+<section class="hero">
+  <div class="hero-geo" aria-hidden="true">
+    <span class="g1"></span><span class="g2"></span><span class="g3"></span>
+  </div>
+  <div class="hero-term" aria-hidden="true">
+    <span class="prompt">~ $</span><span id="term-cmd">whoami</span><span class="cursor">▌</span>
+  </div>
+  <p class="role">{t('home.role', locale)}</p>
+  <h1>{t('home.heading', locale)}</h1>
+  <p class="sub">{t('home.intro', locale)}</p>
+  <div class="hero-actions">
+    <a class="button primary" href={`/${locale}/projects/`}>{t('home.cta.projects', locale)}</a>
+    <a class="button" href={`/${locale}/blog/`}>{t('home.cta.writing', locale)}</a>
+    <a class="text-link" href="mailto:toddzheng024@gmail.com">{t('home.cta.contact', locale)} →</a>
+  </div>
+</section>
+
+<section class="proof" aria-label={t('home.proof.label', locale)}>
+  {proof.map(([value, labelKey]) => (
+    <div class="proof-item"><strong>{value}</strong><span>{t(labelKey, locale)}</span></div>
+  ))}
+</section>
+
+<section class="hub-section animate-in">
+  <div class="section-heading">
+    <div>
+      <p class="section-kicker">{t('home.building.kicker', locale)}</p>
+      <h2>{t('home.building', locale)}</h2>
+    </div>
+    <a href={`/${locale}/projects/`}>{t('home.allProjects', locale)} →</a>
+  </div>
+  <p class="section-intro">{t('home.building.intro', locale)}</p>
+  <div class="product-grid">
+    {FEATURED_PROJECTS.map((product) => (
+      <a class="product-card" href={product.url} target="_blank" rel="noopener">
+        <Image src={product.image} alt="" width={800} />
+        <div class="product-body">
+          <div class="product-name">{product.name}<span aria-hidden="true"> ↗</span></div>
+          <p>{t(product.descKey, locale)}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
+
+<section class="hub-section writing animate-in">
+  <div class="section-heading">
+    <div>
+      <p class="section-kicker">{t('home.writing.kicker', locale)}</p>
+      <h2>{t('home.writing', locale)}</h2>
+    </div>
+    <a href={`/${locale}/blog/`}>{t('home.allWriting', locale)} →</a>
+  </div>
+  {recentPosts.length === 0 ? (
+    <p class="empty">{t('home.empty', locale)}</p>
+  ) : (
+    <ul class="post-list">
+      {recentPosts.map((post) => (
+        <li class="post-card">
+          <a href={`/${locale}/blog/${post.id.replace(`${locale}/`, '')}/`}>
+            <div class="post-copy">
+              <div class="post-title">{post.data.title}</div>
+              {post.data.description && <div class="post-desc">{post.data.description}</div>}
+            </div>
+            <time datetime={post.data.pubDate.toISOString()}>
+              {post.data.pubDate.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+            </time>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</section>
+
+<style>
+  .hero { margin-bottom: 2.5em; }
+  .hero-geo { display: flex; gap: 6px; margin-bottom: 2em; animation: rise 0.4s ease-out both; }
+  .hero-geo span { display: block; height: 3px; }
+  .hero-geo .g1 { width: 48px; background: var(--accent); }
+  .hero-geo .g2 { width: 24px; background: var(--accent-amber); }
+  .hero-geo .g3 { width: 12px; background: var(--text-muted); }
+  .hero-term { font-family: var(--font-jetbrains), monospace; font-size: 0.82em; color: var(--text-muted); margin-bottom: 1em; }
+  .hero-term .prompt { color: var(--accent); margin-right: 0.5em; }
+  .hero-term .cursor { color: var(--accent-amber); animation: blink 1.1s step-end infinite; }
+  .role { margin: 0 0 0.4em; color: var(--accent-amber); font-family: var(--font-jetbrains), monospace; font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(2.5em, 8vw, 4.4em); margin-bottom: 0.2em; letter-spacing: -0.04em; }
+  .hero .sub { color: var(--text-muted); font-size: 1.12em; max-width: 700px; line-height: 1.65; }
+  .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 0.8em; margin-top: 1.6em; }
+  .button { display: inline-flex; align-items: center; min-height: 42px; padding: 0 1.1em; border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-weight: 600; text-decoration: none; transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
+  .button:hover { border-color: var(--accent); background: var(--bg-card); color: var(--text); transform: translateY(-1px); }
+  .button.primary { border-color: #c6261c; background: #c6261c; color: #fff; }
+  .button.primary:hover { border-color: #a91f17; background: #a91f17; color: #fff; }
+  .text-link { margin-left: 0.3em; color: #ff6256; }
+  .proof { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 4.5em; border: 1px solid var(--border); border-radius: 8px; background: rgba(21, 27, 36, 0.72); }
+  .proof-item { padding: 1.1em; border-right: 1px solid var(--border); }
+  .proof-item:last-child { border-right: 0; }
+  .proof-item strong { display: block; color: var(--text); font-family: var(--font-space-grotesk); font-size: 1.35em; line-height: 1.2; }
+  .proof-item span { display: block; margin-top: 0.35em; color: var(--text-muted); font-size: 0.72em; line-height: 1.4; }
+  .hub-section { margin-bottom: 4.5em; animation-delay: 0.08s; }
+  .section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 1em; margin-bottom: 0.5em; }
+  .section-heading h2 { margin: 0; font-size: 1.7em; }
+  .section-heading > a { flex: none; color: #ff6256; font-size: 0.86em; }
+  .section-kicker { margin: 0 0 0.2em; color: var(--text-muted); font-family: var(--font-jetbrains), monospace; font-size: 0.72em; letter-spacing: 0.08em; text-transform: uppercase; }
+  .section-intro { max-width: 650px; margin: 0 0 1.5em; color: var(--text-muted); font-size: 0.94em; }
+  .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1em; }
+  .product-card { display: block; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
+  .product-card:hover { border-color: var(--accent); background: var(--bg-card-hover); color: var(--text); transform: translateY(-2px); }
+  .product-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; border-radius: 0; border-bottom: 1px solid var(--border); }
+  .product-body { padding: 0.9em 1em 1em; }
+  .product-name { font-weight: 700; }
+  .product-name span { color: var(--accent); }
+  .product-body p { margin: 0.45em 0 0; color: var(--text-muted); font-size: 0.78em; line-height: 1.55; }
+  .post-list { list-style: none; margin: 1.5em 0 0; padding: 0; }
+  .post-card a { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5em; padding: 1.15em 0; border-top: 1px solid var(--border); color: var(--text); }
+  .post-card:last-child a { border-bottom: 1px solid var(--border); }
+  .post-card a:hover .post-title { color: var(--accent); }
+  .post-title { font-size: 1.08em; font-weight: 600; transition: color 0.2s ease; }
+  .post-desc { margin-top: 0.2em; color: var(--text-muted); font-size: 0.82em; line-height: 1.5; }
+  .post-card time { flex: none; color: var(--text-muted); font-family: var(--font-jetbrains), monospace; font-size: 0.7em; }
+  .empty { color: var(--text-muted); font-style: italic; }
+  @media (max-width: 720px) {
+    .hero { margin-bottom: 2em; }
+    .hero h1 { font-size: 2.7em; }
+    .text-link { width: 100%; margin: 0.3em 0 0; }
+    .proof { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 3.5em; }
+    .proof-item:nth-child(2) { border-right: 0; }
+    .proof-item:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+    .product-grid { grid-template-columns: 1fr; }
+    .product-body p { font-size: 0.86em; }
+    .post-card a { display: block; }
+    .post-card time { display: block; margin-top: 0.5em; }
+    .section-heading { align-items: baseline; }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const command = document.getElementById('term-cmd');
+    if (!command) return;
+    const text = 'whoami';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      command.textContent = text;
+      return;
+    }
+    command.textContent = '';
+    let index = 0;
+    const timer = window.setInterval(() => {
+      command.textContent = text.slice(0, ++index);
+      if (index >= text.length) window.clearInterval(timer);
+    }, 90);
+  });
+</script>
