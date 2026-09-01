@@ -113,11 +113,15 @@ const dict: Record<string, Record<string, string>> = {
 
   // Projects page
   'projects.heading':  { en: 'Projects',       zh: '项目' },
-  'projects.featured': { en: 'Featured',       zh: '精选' },
+  'projects.featured': { en: "Products I've built", zh: '我做的产品' },
   'projects.recent':   { en: 'On GitHub', zh: 'GitHub 项目' },
   'projects.pax.desc': {
-    en: 'Agent collaboration platform — see what your agents are doing, let them pass context directly to each other, and keep human approvals where risk starts.',
-    zh: 'Agent 协作平台——看清你的 Agent 在做什么，让它们之间直接传递上下文，并把人工审批留在风险发生的地方。',
+    en: 'I build conversion-focused websites, connected workflows, and practical AI systems that help small businesses grow with less manual work.',
+    zh: '我为小型企业构建以转化为导向的网站、互联工作流和实用 AI 系统，帮助业务增长并减少重复劳动。',
+  },
+  'projects.pluginHub.desc': {
+    en: 'I built this independent registry to make DeepSeek Harness plugins and reusable profiles easier to discover, verify, and install.',
+    zh: '我做的独立社区注册中心，让 DeepSeek Harness 插件与可复用 Profiles 更容易被发现、验证和安装。',
   },
   'projects.roundtable.desc': {
     en: 'Agent-native knowledge sharing — ask a question, and AI agents with distinct expert personas debate and answer it roundtable-style.',

@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import pluginHubPreview from '../assets/dsh-plugin-hub-preview.png';
 import paxPreview from '../assets/paxtech-preview.png';
 import roundtablePreview from '../assets/roundtable-preview.png';
 import { t } from '../i18n/translations';
@@ -14,10 +15,16 @@ const repos = await getRecentRepos(5);
 
 const featured = [
   {
-    name: 'Pax',
+    name: 'Pax Tech',
     url: 'https://paxtech.net',
     image: paxPreview,
     descKey: 'projects.pax.desc',
+  },
+  {
+    name: 'DSH Plugin Hub',
+    url: 'https://dshpluginhub.ai',
+    image: pluginHubPreview,
+    descKey: 'projects.pluginHub.desc',
   },
   {
     name: 'Roundtable',
@@ -99,10 +106,15 @@ const formatDate = (iso: string) =>
 <style>
   .featured-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.25em;
   }
-  @media (max-width: 640px) {
+  @media (max-width: 760px) {
+    .featured-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 520px) {
     .featured-grid {
       grid-template-columns: 1fr;
     }
@@ -124,7 +136,7 @@ const formatDate = (iso: string) =>
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     object-position: top;
     border-radius: 0;
@@ -136,6 +148,7 @@ const formatDate = (iso: string) =>
   .featured-head {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: 0.75em;
   }
   .featured-name {
