@@ -2,9 +2,9 @@
 title: "光谱"
 description: "从模糊需求到具体实现，每个人只能覆盖其中一段。AI 缩短了这条光谱，也让个人面临做深或做广的选择。"
 pubDate: 2026-09-01
+updatedDate: 2026-09-01
 heroImage: "/media/01-spectrum-coverage-623c1ba2.png"
 tags: ["AI", "产品", "软件工程", "职业"]
-draft: true
 ---
 
 “我每天跟单很烦。”
