@@ -2,9 +2,9 @@
 title: "The Spectrum"
 description: "From vague needs to concrete implementation, each person covers only part of the spectrum. AI shortens that distance and forces a choice between depth and breadth."
 pubDate: 2026-09-01
+updatedDate: 2026-09-01
 heroImage: "/media/01-spectrum-coverage-en-a525c630.png"
 tags: ["ai", "product", "software-engineering", "career"]
-draft: true
 ---
 
 “I’m so tired of tracking every order by hand.”
