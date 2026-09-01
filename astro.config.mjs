@@ -1,6 +1,7 @@
 // @ts-check
 
 import mdx from '@astrojs/mdx';
+import { unified } from '@astrojs/markdown-remark';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 import remarkMath from 'remark-math';
@@ -35,19 +36,21 @@ export default defineConfig({
 		},
 	},
 	markdown: {
-		remarkPlugins: [remarkMath],
-		rehypePlugins: [
-			rehypeKatex,
-			rehypeSlug,
-			[
-				rehypeAutolinkHeadings,
-				{
-					behavior: 'append',
-					properties: { className: ['heading-anchor'], ariaHidden: 'true', tabIndex: -1 },
-					content: { type: 'text', value: '#' },
-				},
+		processor: unified({
+			remarkPlugins: [remarkMath],
+			rehypePlugins: [
+				rehypeKatex,
+				rehypeSlug,
+				[
+					rehypeAutolinkHeadings,
+					{
+						behavior: 'append',
+						properties: { className: ['heading-anchor'], ariaHidden: 'true', tabIndex: -1 },
+						content: { type: 'text', value: '#' },
+					},
+				],
 			],
-		],
+		}),
 		shikiConfig: {
 			theme: 'github-dark',
 			wrap: true,
