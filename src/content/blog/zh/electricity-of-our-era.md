@@ -3,8 +3,6 @@ title: "我们时代的电力"
 description: 'Token 是新时代的电力——关于 AI 普及、边际效用递减，以及为什么 Agent 设计必须不依赖任何一家模型厂商。'
 pubDate: 2026-06-16
 tags: ["ai", "llm", "anthropic", "token-economics", "democratization", "technology"]
-series: ai-era
-seriesOrder: 2
 ---
 
 最近 Anthropic 的 Fable 5 发布，以及紧随其后的短暂供应中断，又冲上了热搜。一个如此强大的模型，人人都想用，但 Anthropic 和美国政府的态度却相当暧昧：一边大搞饥饿营销——不安全、跟 GPT 对比云云——一边又拿安全说事，路由层面限制用户在任意场景使用，甚至明文禁止非美国国民访问。

@@ -3,8 +3,6 @@ title: "AI 时代需要的不是码农，而是先行者"
 description: "LeetCode 筛不出我们真正需要的人。关于抽象能力、开放心态，以及当 AI 让每个人都能构建产品时，软件工程师到底该做什么。"
 pubDate: 2026-05-11
 tags: ["ai", "软件工程", "招聘", "职业"]
-series: ai-era
-seriesOrder: 1
 ---
 
 ## 面试

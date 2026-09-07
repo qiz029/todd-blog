@@ -3,8 +3,6 @@ title: "The AI Era Doesn't Need Code Monkeys — It Needs Pioneers"
 description: "LeetCode can't find the engineers we actually need. On abstraction, openness, and what happens when AI makes everyone a builder."
 pubDate: 2026-05-11
 tags: ["ai", "software-engineering", "hiring", "career"]
-series: ai-era
-seriesOrder: 1
 ---
 
 ## The Interview Problem

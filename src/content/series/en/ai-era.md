@@ -2,6 +2,7 @@
 title: "Engineers in the AI Era"
 description: "When models become infrastructure and everyone can build, where does a software engineer's value actually land?"
 status: ongoing
+draft: true
 upNext: "How teams collaborate in the age of agents"
 ---
 

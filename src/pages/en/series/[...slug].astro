@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import SeriesIndex from '../../../layouts/SeriesIndex.astro';
+import SeriesPage from '../../../layouts/SeriesPage.astro';
+import { localePosts, localeSeries, seriesPosts, seriesSlug } from '../../../lib/blog';
+
+// Serves /series/ (index) and /series/<slug>/ (detail). With no published
+// series, neither page is generated, so the section is invisible.
+export async function getStaticPaths() {
+  const locale = 'en';
+  const allSeries = await getCollection('series');
+  const mine = localeSeries(allSeries, locale);
+  if (mine.length === 0) return [];
+  const posts = localePosts(await getCollection('blog'), locale);
+  const otherLocale = locale === 'zh' ? 'en' : 'zh';
+  const otherSlugs = new Set(localeSeries(allSeries, otherLocale).map((s) => seriesSlug(s, otherLocale)));
+  return [
+    { params: { slug: undefined }, props: { kind: 'index' as const } },
+    ...mine.map((entry) => {
+      const slug = seriesSlug(entry, locale);
+      return {
+        params: { slug },
+        props: { kind: 'detail' as const, entry, slug, posts: seriesPosts(posts, slug), alternates: otherSlugs.has(slug) },
+      };
+    }),
+  ];
+}
+
+const props = Astro.props;
+---
+
+{props.kind === 'index' ? (
+  <SeriesIndex locale="en" />
+) : (
+  <SeriesPage locale="en" entry={props.entry} slug={props.slug} posts={props.posts} alternates={props.alternates} />
+)}

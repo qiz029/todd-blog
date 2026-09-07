@@ -2,6 +2,7 @@
 title: "AI 时代的工程师"
 description: "当模型成为基础设施、人人都能构建产品，软件工程师的价值到底落在哪里？"
 status: ongoing
+draft: true
 upNext: "Agent 时代的团队协作方式"
 ---
 

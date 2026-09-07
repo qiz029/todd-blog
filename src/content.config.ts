@@ -36,6 +36,8 @@ const series = defineCollection({
 			title: z.string(),
 			description: z.string(),
 			status: z.enum(['ongoing', 'completed']).default('ongoing'),
+			// Draft series are invisible everywhere (no pages, badges, banners or OG images).
+			draft: z.boolean().default(false),
 			cover: z.union([image(), z.string()]).optional(),
 			// Optional teaser for what comes next in an ongoing series.
 			upNext: z.string().optional(),

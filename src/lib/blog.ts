@@ -74,9 +74,9 @@ export function seriesUrl(slug: string, locale: string): string {
 	return `/${locale}/series/${slug}/`;
 }
 
-/** Series entries for one locale. */
+/** Published series entries for one locale. */
 export function localeSeries(all: Series[], locale: string): Series[] {
-	return all.filter((s) => s.id.startsWith(locale + '/'));
+	return all.filter((s) => s.id.startsWith(locale + '/') && !s.data.draft);
 }
 
 /** Posts in one series, in reading order: explicit seriesOrder first, then oldest first. */

@@ -3,8 +3,6 @@ title: "The Electricity of Our Era"
 description: "Token supply is the electricity of our era — on AI democratization, diminishing returns, and why agent harnesses must be provider-agnostic."
 pubDate: 2026-06-16
 tags: ["ai", "llm", "anthropic", "token-economics", "democratization", "technology"]
-series: ai-era
-seriesOrder: 2
 ---
 
 Anthropic's recent Fable 5 release — and the brief supply cutoff that followed — made headlines again. It's a powerful model, and everyone wants to use it. But Anthropic and the U.S. government have been sending mixed signals: on the one hand, relentless scarcity marketing (it's unsafe, compare it with GPT, etc.), and on the other, safety pretexts — routing restrictions that prevent users from using the model however they want, and an outright ban on access for non-U.S. nationals.
