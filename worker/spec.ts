@@ -61,6 +61,12 @@ export const operations: Operation[] = [
 				schema: { type: 'boolean' },
 				description: 'If true, only drafts (auth required). If false, only published. Omitted: published for anonymous, all for authenticated.',
 			},
+			{
+				name: 'series',
+				in: 'query',
+				schema: { type: 'string' },
+				description: 'Only posts in this series (slug)',
+			},
 		],
 	},
 	{
@@ -114,6 +120,65 @@ export const operations: Operation[] = [
 					schema: { $ref: '#/components/schemas/UpdatePost' },
 				},
 			},
+		},
+	},
+	{
+		method: 'GET',
+		path: '/api/series',
+		operationId: 'listSeries',
+		summary: 'List series',
+		description:
+			'A series groups posts into an ordered reading list. Query `locale=en|zh` and `draft=true|false`; drafts require a bearer token.',
+		tags: ['series'],
+		auth: 'drafts',
+		parameters: [
+			{ name: 'locale', in: 'query', schema: { type: 'string', enum: ['en', 'zh'] } },
+			{ name: 'draft', in: 'query', schema: { type: 'boolean' } },
+		],
+	},
+	{
+		method: 'POST',
+		path: '/api/series',
+		operationId: 'createSeries',
+		summary: 'Create a series',
+		description:
+			'Writes src/content/series/{locale}/{slug}.md via GitHub; the site rebuilds automatically. Defaults to draft=true (invisible on the site until published). Never overwrites an existing slug (409). Attach posts by setting `series` / `seriesOrder` on them.',
+		tags: ['series'],
+		auth: 'bearer',
+		successStatus: 201,
+		requestBody: {
+			required: true,
+			content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateSeries' } } },
+		},
+	},
+	{
+		method: 'GET',
+		path: '/api/series/{locale}/{slug}',
+		operationId: 'getSeries',
+		summary: 'Get one series',
+		description: 'Drafts require a bearer token.',
+		tags: ['series'],
+		auth: 'drafts',
+		parameters: [
+			{ name: 'locale', in: 'path', required: true, schema: { type: 'string', enum: ['en', 'zh'] } },
+			{ name: 'slug', in: 'path', required: true, schema: { type: 'string', pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' } },
+		],
+	},
+	{
+		method: 'PATCH',
+		path: '/api/series/{locale}/{slug}',
+		operationId: 'updateSeries',
+		summary: 'Update a series',
+		description: 'Partial update. draft=false publishes the series page and shows it on member posts; draft=true hides it again. status=completed marks it finished.',
+		tags: ['series'],
+		auth: 'bearer',
+		parameters: [
+			{ name: 'locale', in: 'path', required: true, schema: { type: 'string', enum: ['en', 'zh'] } },
+			{ name: 'slug', in: 'path', required: true, schema: { type: 'string' } },
+		],
+		requestBody: {
+			required: true,
+			content: { 'application/json': { schema: { $ref: '#/components/schemas/UpdateSeries' } } },
 		},
 	},
 	{
@@ -214,7 +279,7 @@ const schemas = {
 			heroImageUrl: { type: 'string', description: 'Typically /media/{key}' },
 			series: {
 				type: 'string',
-				description: 'Series slug (kebab-case). Must match an existing src/content/series/{locale}/{slug}.md or the site build fails.',
+				description: 'Slug of an existing series in the same locale (see GET /api/series). Validated on write; create the series first with POST /api/series.',
 			},
 			seriesOrder: { type: 'integer', minimum: 1, description: '1-based reading position within the series' },
 		},
@@ -255,6 +320,51 @@ const schemas = {
 			_links: { type: 'object', additionalProperties: true },
 		},
 	},
+	CreateSeries: {
+		type: 'object',
+		required: ['locale', 'title', 'description'],
+		properties: {
+			locale: { type: 'string', enum: ['en', 'zh'] },
+			slug: { type: 'string', description: 'Shared across locales so the two language versions pair up. Derived from title when omitted.' },
+			title: { type: 'string' },
+			description: { type: 'string', description: 'One-line summary shown on cards' },
+			intro: { type: 'string', description: 'Markdown long-form introduction shown on the series page' },
+			status: { type: 'string', enum: ['ongoing', 'completed'], default: 'ongoing' },
+			draft: { type: 'boolean', default: true },
+			upNext: { type: 'string', description: 'Teaser for the next planned part (ongoing series only)' },
+			coverUrl: { type: 'string', description: 'Typically /media/{key}' },
+		},
+	},
+	UpdateSeries: {
+		type: 'object',
+		properties: {
+			title: { type: 'string' },
+			description: { type: 'string' },
+			intro: { type: 'string' },
+			status: { type: 'string', enum: ['ongoing', 'completed'] },
+			draft: { type: 'boolean', description: 'false publishes; true hides' },
+			upNext: { type: ['string', 'null'] },
+			coverUrl: { type: ['string', 'null'] },
+		},
+	},
+	Series: {
+		type: 'object',
+		properties: {
+			locale: { type: 'string' },
+			slug: { type: 'string' },
+			title: { type: 'string' },
+			description: { type: 'string' },
+			intro: { type: 'string' },
+			status: { type: 'string', enum: ['ongoing', 'completed'] },
+			draft: { type: 'boolean' },
+			upNext: { type: ['string', 'null'] },
+			cover: { type: ['string', 'null'] },
+			sha: { type: 'string' },
+			commitSha: { type: 'string' },
+			htmlUrl: { type: 'string' },
+			_links: { type: 'object', additionalProperties: true },
+		},
+	},
 	Media: {
 		type: 'object',
 		properties: {
@@ -264,6 +374,12 @@ const schemas = {
 		},
 	},
 };
+
+function responseSchema(op: Operation): string {
+	if (op.tags.includes('media')) return 'Media';
+	if (op.tags.includes('series')) return 'Series';
+	return 'Post';
+}
 
 export function buildOpenApi(origin: string): unknown {
 	const paths: Record<string, Record<string, unknown>> = {};
@@ -283,7 +399,7 @@ export function buildOpenApi(origin: string): unknown {
 					description: 'OK',
 					content: {
 						'application/json': {
-							schema: { $ref: '#/components/schemas/' + (op.operationId === 'uploadMedia' ? 'Media' : op.operationId === 'getMedia' ? 'Media' : 'Post') },
+							schema: { $ref: '#/components/schemas/' + responseSchema(op) },
 						},
 					},
 				},
@@ -306,6 +422,7 @@ export function buildOpenApi(origin: string): unknown {
 		tags: [
 			{ name: 'discovery' },
 			{ name: 'posts' },
+			{ name: 'series' },
 			{ name: 'media' },
 		],
 		paths,

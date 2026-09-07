@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { handleRequest } from './index';
-import { parseMarkdown, serializeMarkdown, slugify } from './markdown';
+import { parseMarkdown, parseSeriesMarkdown, serializeMarkdown, serializeSeriesMarkdown, slugify } from './markdown';
 import { utf8ToBase64, base64ToUtf8 } from './github';
 
 const TOKEN = 'test-cms-token';
@@ -152,6 +152,24 @@ describe('markdown', () => {
 		expect(parseMarkdown(orphan).series).toBeUndefined();
 	});
 
+	it('round-trips series metadata files', () => {
+		const md = serializeSeriesMarkdown({
+			title: 'AI 时代的工程师',
+			description: 'One line',
+			status: 'completed',
+			draft: true,
+			upNext: 'Next: "agents"',
+			body: 'Intro paragraph.\n',
+		});
+		expect(md).toContain('status: completed');
+		expect(md).toContain('draft: true');
+		expect(md).toContain('upNext: "Next: \\"agents\\""');
+		const parsed = parseSeriesMarkdown(md);
+		expect(parsed).toMatchObject({ title: 'AI 时代的工程师', status: 'completed', draft: true, upNext: 'Next: "agents"' });
+		expect(parsed.body.trim()).toBe('Intro paragraph.');
+		expect(parseSeriesMarkdown('---\ntitle: x\n---\n').status).toBe('ongoing');
+	});
+
 	it('slugifies titles', () => {
 		expect(slugify('Hello World!')).toBe('hello-world');
 	});
@@ -182,6 +200,14 @@ describe('CMS worker', () => {
 		});
 		files.set('src/content/blog/en/published.md', { content: published, sha: 'sha-pub' });
 		files.set('src/content/blog/en/secret.md', { content: draft, sha: 'sha-draft' });
+		files.set('src/content/series/en/live-series.md', {
+			content: serializeSeriesMarkdown({ title: 'Live Series', description: 'd', status: 'ongoing', draft: false, body: 'Intro' }),
+			sha: 'sha-series-live',
+		});
+		files.set('src/content/series/en/hidden-series.md', {
+			content: serializeSeriesMarkdown({ title: 'Hidden Series', description: 'd', status: 'ongoing', draft: true, body: '' }),
+			sha: 'sha-series-hidden',
+		});
 		restore = installGitHub(files);
 		env = makeEnv();
 	});
@@ -196,12 +222,14 @@ describe('CMS worker', () => {
 		expect(link).toContain('rel="service-desc"');
 		expect(link).toContain('/api/openapi.json');
 		expect(link).toContain('/api/posts');
+		expect(link).toContain('/api/series');
 		expect(link).toContain('/api/media');
 		const body = (await res.json()) as { _links: Record<string, { href: string; rel?: string }> };
 		expect(body._links.self.href).toBe('https://toddzheng.net/api');
 		expect(body._links.openapi.href).toBe('https://toddzheng.net/api/openapi.json');
 		expect(body._links.openapi.rel).toBe('service-desc');
 		expect(body._links.posts.href).toMatch(/\/api\/posts$/);
+		expect(body._links.series.href).toMatch(/\/api\/series$/);
 		expect(body._links.media.href).toMatch(/\/api\/media$/);
 	});
 
@@ -219,6 +247,10 @@ describe('CMS worker', () => {
 		expect(spec.paths['/api/posts/{locale}/{slug}'].patch.operationId).toBe('updatePost');
 		expect(spec.paths['/api/media'].post.operationId).toBe('uploadMedia');
 		expect(spec.paths['/media/{key}'].get.operationId).toBe('getMedia');
+		expect(spec.paths['/api/series'].get.operationId).toBe('listSeries');
+		expect(spec.paths['/api/series'].post.operationId).toBe('createSeries');
+		expect(spec.paths['/api/series/{locale}/{slug}'].get.operationId).toBe('getSeries');
+		expect(spec.paths['/api/series/{locale}/{slug}'].patch.operationId).toBe('updateSeries');
 	});
 
 	it('mutating routes return 401 without a bearer token', async () => {
@@ -374,5 +406,157 @@ describe('CMS worker', () => {
 		const slugs = body.posts.map((p) => p.slug);
 		expect(slugs).toContain('published');
 		expect(slugs).not.toContain('secret');
+	});
+	// ── Series ──
+
+	it('anonymous series list and get hide drafts; auth reveals them', async () => {
+		const anon = await handleRequest(req('/api/series?locale=en'), env);
+		expect(anon.status).toBe(200);
+		const list = (await anon.json()) as { series: Array<{ slug: string; intro?: string }> };
+		expect(list.series.map((s) => s.slug)).toEqual(['live-series']);
+		expect(list.series[0]).not.toHaveProperty('intro');
+
+		const hidden = await handleRequest(req('/api/series/en/hidden-series'), env);
+		expect(hidden.status).toBe(401);
+
+		const authed = await handleRequest(req('/api/series?locale=en&draft=true', auth()), env);
+		const drafts = (await authed.json()) as { series: Array<{ slug: string }> };
+		expect(drafts.series.map((s) => s.slug)).toEqual(['hidden-series']);
+
+		const one = await handleRequest(req('/api/series/en/live-series'), env);
+		const body = (await one.json()) as { intro: string; htmlUrl: string; _links: { sibling: { href: string }; posts: { href: string } } };
+		expect(body.intro.trim()).toBe('Intro');
+		expect(body.htmlUrl).toBe('/en/series/live-series/');
+		expect(body._links.sibling.href).toBe('https://toddzheng.net/api/series/zh/live-series');
+		expect(body._links.posts.href).toContain('/api/posts?locale=en&series=live-series');
+	});
+
+	it('creates a draft series file via GitHub and refuses duplicates', async () => {
+		const create = () =>
+			handleRequest(
+				req(
+					'/api/series',
+					auth({
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							locale: 'zh',
+							title: 'AI 时代的工程师',
+							slug: 'ai-era',
+							description: '一句话',
+							intro: '这个专栏……',
+							upNext: '下一篇',
+						}),
+					}),
+				),
+				env,
+			);
+		const res = await create();
+		expect(res.status).toBe(201);
+		const body = (await res.json()) as { draft: boolean; status: string; slug: string; commitSha: string; _links: { self: { href: string } } };
+		expect(body.draft).toBe(true);
+		expect(body.status).toBe('ongoing');
+		expect(body.slug).toBe('ai-era');
+		expect(body.commitSha).toMatch(/^commit-/);
+		expect(body._links.self.href).toBe('https://toddzheng.net/api/series/zh/ai-era');
+		const stored = files.get('src/content/series/zh/ai-era.md')!;
+		expect(stored.content).toContain('title: "AI 时代的工程师"');
+		expect(stored.content).toContain('draft: true');
+		expect(stored.content).toContain('upNext: "下一篇"');
+		expect(stored.content.trim().endsWith('这个专栏……')).toBe(true);
+
+		const dup = await create();
+		expect(dup.status).toBe(409);
+
+		const anon = await handleRequest(
+			req('/api/series', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }),
+			env,
+		);
+		expect(anon.status).toBe(401);
+	});
+
+	it('PATCH publishes a series, changes status, and clears upNext with null', async () => {
+		const res = await handleRequest(
+			req(
+				'/api/series/en/hidden-series',
+				auth({
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ draft: false, status: 'completed', upNext: null }),
+				}),
+			),
+			env,
+		);
+		expect(res.status).toBe(200);
+		const body = (await res.json()) as { draft: boolean; status: string; upNext: string | null };
+		expect(body).toMatchObject({ draft: false, status: 'completed', upNext: null });
+		const stored = files.get('src/content/series/en/hidden-series.md')!.content;
+		expect(stored).toContain('status: completed');
+		expect(stored).not.toContain('draft: true');
+
+		const bad = await handleRequest(
+			req('/api/series/en/live-series', auth({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'paused' }) })),
+			env,
+		);
+		expect(bad.status).toBe(400);
+
+		const missing = await handleRequest(
+			req('/api/series/en/nope', auth({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'x' }) })),
+			env,
+		);
+		expect(missing.status).toBe(404);
+	});
+
+	it('posts can only join a series that exists in their locale', async () => {
+		const post = (series: string, locale = 'en') =>
+			handleRequest(
+				req(
+					'/api/posts',
+					auth({
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ locale, slug: 'part-one-' + series, title: 'Part one', description: 'd', body: 'b', series, seriesOrder: 1 }),
+					}),
+				),
+				env,
+			);
+
+		const unknown = await post('no-such-series');
+		expect(unknown.status).toBe(400);
+		const err = (await unknown.json()) as { message: string; _links: { series: { href: string } } };
+		expect(err.message).toContain('POST /api/series');
+		expect(err._links.series.href).toMatch(/\/api\/series$/);
+
+		// The series exists in en but not zh: locale-scoped.
+		expect((await post('live-series', 'zh')).status).toBe(400);
+
+		// A draft series is a valid target (posts show series UI once it is published).
+		const ok = await post('hidden-series');
+		expect(ok.status).toBe(201);
+		expect(files.get('src/content/blog/en/part-one-hidden-series.md')!.content).toContain('series: hidden-series');
+
+		// PATCH onto an unknown series is rejected too; null leaves the series.
+		const bad = await handleRequest(
+			req('/api/posts/en/published', auth({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ series: 'ghost' }) })),
+			env,
+		);
+		expect(bad.status).toBe(400);
+		const join = await handleRequest(
+			req('/api/posts/en/published', auth({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ series: 'live-series', seriesOrder: 2 }) })),
+			env,
+		);
+		expect(join.status).toBe(200);
+
+		// ?series= filters the post list.
+		const filtered = await handleRequest(req('/api/posts?locale=en&series=live-series'), env);
+		const list = (await filtered.json()) as { posts: Array<{ slug: string; series: string; seriesOrder: number }> };
+		expect(list.posts).toEqual([expect.objectContaining({ slug: 'published', series: 'live-series', seriesOrder: 2 })]);
+
+		const leave = await handleRequest(
+			req('/api/posts/en/published', auth({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ series: null }) })),
+			env,
+		);
+		const left = (await leave.json()) as { series: string | null; seriesOrder: number | null };
+		expect(left).toMatchObject({ series: null, seriesOrder: null });
 	});
 });

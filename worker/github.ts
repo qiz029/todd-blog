@@ -65,9 +65,9 @@ export function base64ToUtf8(b64: string): string {
 	return new TextDecoder().decode(bytes);
 }
 
-export async function getFile(env: Env, locale: string, slug: string): Promise<GitFile | null> {
+/** Read one file at a repo path (e.g. src/content/series/en/foo.md). */
+export async function getRepoFile(env: Env, path: string): Promise<GitFile | null> {
 	const { owner, repo, branch } = repoParts(env);
-	const path = contentPath(locale, slug);
 	const res = await gh(env, `/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`);
 	if (res.status === 404) return null;
 	if (!res.ok) {
@@ -78,9 +78,13 @@ export async function getFile(env: Env, locale: string, slug: string): Promise<G
 	return { path: data.path, sha: data.sha, content: base64ToUtf8(data.content) };
 }
 
-export async function listPosts(env: Env, locale: string): Promise<Array<{ name: string; path: string; sha: string }>> {
+export function getFile(env: Env, locale: string, slug: string): Promise<GitFile | null> {
+	return getRepoFile(env, contentPath(locale, slug));
+}
+
+/** List the .md files directly inside a repo directory. */
+export async function listMarkdownDir(env: Env, dir: string): Promise<Array<{ name: string; path: string; sha: string }>> {
 	const { owner, repo, branch } = repoParts(env);
-	const dir = `src/content/blog/${locale}`;
 	const res = await gh(env, `/repos/${owner}/${repo}/contents/${dir}?ref=${encodeURIComponent(branch)}`);
 	if (res.status === 404) return [];
 	if (!res.ok) {
@@ -91,16 +95,19 @@ export async function listPosts(env: Env, locale: string): Promise<Array<{ name:
 	return data.filter((item) => item.type === 'file' && item.name.endsWith('.md'));
 }
 
-export async function putFile(
+export function listPosts(env: Env, locale: string): Promise<Array<{ name: string; path: string; sha: string }>> {
+	return listMarkdownDir(env, `src/content/blog/${locale}`);
+}
+
+/** Create or update one file at a repo path. Pass sha when updating. */
+export async function putRepoFile(
 	env: Env,
-	locale: string,
-	slug: string,
+	path: string,
 	markdown: string,
 	message: string,
 	sha?: string,
 ): Promise<GitCommitResult> {
 	const { owner, repo, branch } = repoParts(env);
-	const path = contentPath(locale, slug);
 	const body: Record<string, unknown> = {
 		message,
 		content: utf8ToBase64(markdown),
@@ -123,6 +130,17 @@ export async function putFile(
 		sha: data.commit?.sha ?? '',
 		fileSha: data.content?.sha ?? '',
 	};
+}
+
+export function putFile(
+	env: Env,
+	locale: string,
+	slug: string,
+	markdown: string,
+	message: string,
+	sha?: string,
+): Promise<GitCommitResult> {
+	return putRepoFile(env, contentPath(locale, slug), markdown, message, sha);
 }
 
 async function safeJson(res: Response): Promise<unknown> {

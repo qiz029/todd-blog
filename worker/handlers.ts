@@ -6,17 +6,24 @@ import {
 	json,
 	linkHeader,
 	postLinks,
+	seriesHtmlPath,
+	seriesLinks,
 	type Locale,
 } from './http';
-import { GitHubError, getFile, listPosts, putFile } from './github';
+import { GitHubError, getFile, getRepoFile, listMarkdownDir, listPosts, putFile, putRepoFile } from './github';
 import {
+	isSeriesStatus,
 	isValidDate,
 	isValidSlug,
 	parseMarkdown,
+	parseSeriesMarkdown,
 	serializeMarkdown,
+	serializeSeriesMarkdown,
+	seriesPath,
 	slugify,
 	todayUTC,
 	type PostFields,
+	type SeriesFields,
 } from './markdown';
 import { MediaError, getMedia, parseKey, putMedia, readUpload } from './media';
 import { buildOpenApi, type Operation } from './spec';
@@ -43,6 +50,14 @@ export async function dispatchHandler(ctx: Ctx): Promise<Response> {
 			return handleGetPost(ctx);
 		case 'updatePost':
 			return handleUpdatePost(ctx);
+		case 'listSeries':
+			return handleListSeries(ctx);
+		case 'createSeries':
+			return handleCreateSeries(ctx);
+		case 'getSeries':
+			return handleGetSeries(ctx);
+		case 'updateSeries':
+			return handleUpdateSeries(ctx);
 		case 'uploadMedia':
 			return handleUploadMedia(ctx);
 		case 'getMedia':
@@ -57,6 +72,7 @@ function handleDiscover(ctx: Ctx): Response {
 		{ href: abs(ctx.request, '/api'), rel: 'self' },
 		{ href: abs(ctx.request, '/api/openapi.json'), rel: 'service-desc' },
 		{ href: abs(ctx.request, '/api/posts'), rel: 'posts' },
+		{ href: abs(ctx.request, '/api/series'), rel: 'series' },
 		{ href: abs(ctx.request, '/api/media'), rel: 'media' },
 	];
 	return json(
@@ -66,7 +82,8 @@ function handleDiscover(ctx: Ctx): Response {
 				self: { href: links[0].href },
 				openapi: { href: links[1].href, rel: 'service-desc' },
 				posts: { href: links[2].href },
-				media: { href: links[3].href },
+				series: { href: links[3].href },
+				media: { href: links[4].href },
 			},
 		},
 		200,
@@ -108,6 +125,7 @@ async function handleListPosts(ctx: Ctx): Promise<Response> {
 	const url = new URL(ctx.request.url);
 	const localeParam = url.searchParams.get('locale');
 	const draftParam = url.searchParams.get('draft');
+	const seriesParam = url.searchParams.get('series');
 
 	if (localeParam && !isLocale(localeParam)) {
 		return errorJson(ctx.request, 400, 'invalid', 'locale must be en or zh');
@@ -117,6 +135,9 @@ async function handleListPosts(ctx: Ctx): Promise<Response> {
 	}
 	if (draftParam === 'true' && !ctx.authed) {
 		return errorJson(ctx.request, 401, 'unauthorized', 'Authorization: Bearer CMS_TOKEN required for drafts');
+	}
+	if (seriesParam !== null && !isValidSlug(seriesParam)) {
+		return errorJson(ctx.request, 400, 'invalid', 'series must be a kebab-case slug');
 	}
 
 	const locales: Locale[] = localeParam && isLocale(localeParam) ? [localeParam] : ['en', 'zh'];
@@ -140,6 +161,7 @@ async function handleListPosts(ctx: Ctx): Promise<Response> {
 				if (item.fields.draft && !ctx.authed) continue;
 				if (wantDraft === true && !item.fields.draft) continue;
 				if (wantDraft === false && item.fields.draft) continue;
+				if (seriesParam !== null && item.fields.series !== seriesParam) continue;
 				const resource = postResource(ctx, item.locale, item.slug, item.fields, { sha: item.sha });
 				const { body: _body, ...summary } = resource as typeof resource & { body: string };
 				posts.push(summary);
@@ -254,6 +276,15 @@ function parseSeriesOrder(request: Request, value: unknown): number | undefined 
 	return value;
 }
 
+/** 400 unless src/content/series/<locale>/<slug>.md exists (draft or published). */
+async function requireSeriesExists(ctx: Ctx, locale: Locale, slug: string): Promise<Response | null> {
+	const file = await getRepoFile(ctx.env, seriesPath(locale, slug));
+	if (file) return null;
+	return errorJson(ctx.request, 400, 'invalid', `Series ${locale}/${slug} does not exist; create it first with POST /api/series`, {
+		_links: { series: { href: abs(ctx.request, '/api/series') } },
+	});
+}
+
 async function handleCreatePost(ctx: Ctx): Promise<Response> {
 	const body = await readJson(ctx.request);
 	if (body instanceof Response) return body;
@@ -323,6 +354,10 @@ async function handleCreatePost(ctx: Ctx): Promise<Response> {
 		const existing = await getFile(ctx.env, locale, slug);
 		if (existing) {
 			return errorJson(ctx.request, 409, 'conflict', `Post ${locale}/${slug} already exists`);
+		}
+		if (series) {
+			const missing = await requireSeriesExists(ctx, locale, series);
+			if (missing) return missing;
 		}
 		const markdown = serializeMarkdown(fields);
 		const result = await putFile(ctx.env, locale, slug, markdown, `cms: add ${locale}/${slug}`);
@@ -400,6 +435,10 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 		if (body.series !== undefined) {
 			const series = parseSeries(ctx.request, body.series);
 			if (series instanceof Response) return series;
+			if (series && series !== fields.series) {
+				const missing = await requireSeriesExists(ctx, locale, series);
+				if (missing) return missing;
+			}
 			fields.series = series;
 			if (!series) fields.seriesOrder = undefined;
 		}
@@ -418,6 +457,243 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 		const message = unpublished ? `cms: unpublish ${locale}/${slug}` : `cms: update ${locale}/${slug}`;
 		const result = await putFile(ctx.env, locale, slug, markdown, message, existing.sha);
 		return json(postResource(ctx, locale, slug, fields, { sha: result.fileSha, commitSha: result.sha }));
+	} catch (err) {
+		return githubError(ctx.request, err);
+	}
+}
+
+// ── Series ──────────────────────────────────────────────────────────────────
+
+interface SeriesWriteBody {
+	locale?: unknown;
+	slug?: unknown;
+	title?: unknown;
+	description?: unknown;
+	intro?: unknown;
+	status?: unknown;
+	draft?: unknown;
+	upNext?: unknown;
+	coverUrl?: unknown;
+}
+
+function seriesResource(
+	ctx: Ctx,
+	locale: Locale,
+	slug: string,
+	fields: SeriesFields,
+	extra: { sha?: string; commitSha?: string } = {},
+) {
+	return {
+		locale,
+		slug,
+		title: fields.title,
+		description: fields.description,
+		intro: fields.body,
+		status: fields.status,
+		draft: fields.draft,
+		upNext: fields.upNext ?? null,
+		cover: fields.cover ?? null,
+		htmlUrl: seriesHtmlPath(locale, slug),
+		...extra,
+		_links: seriesLinks(ctx.request, locale, slug),
+	};
+}
+
+function parseCover(request: Request, value: unknown): string | undefined | Response {
+	if (value === undefined || value === null || value === '') return undefined;
+	if (typeof value !== 'string') return errorJson(request, 400, 'invalid', 'coverUrl must be a string');
+	if (!(value.startsWith('/media/') || /^https?:\/\//.test(value))) {
+		return errorJson(request, 400, 'invalid', 'coverUrl must be a /media/... path or an http(s) URL');
+	}
+	return value;
+}
+
+async function handleListSeries(ctx: Ctx): Promise<Response> {
+	const url = new URL(ctx.request.url);
+	const localeParam = url.searchParams.get('locale');
+	const draftParam = url.searchParams.get('draft');
+	if (localeParam && !isLocale(localeParam)) {
+		return errorJson(ctx.request, 400, 'invalid', 'locale must be en or zh');
+	}
+	if (draftParam !== null && draftParam !== 'true' && draftParam !== 'false') {
+		return errorJson(ctx.request, 400, 'invalid', 'draft must be true or false');
+	}
+	if (draftParam === 'true' && !ctx.authed) {
+		return errorJson(ctx.request, 401, 'unauthorized', 'Authorization: Bearer CMS_TOKEN required for drafts');
+	}
+	const locales: Locale[] = localeParam && isLocale(localeParam) ? [localeParam] : ['en', 'zh'];
+	const wantDraft = draftParam === 'true' ? true : draftParam === 'false' ? false : null;
+
+	const series: unknown[] = [];
+	try {
+		for (const locale of locales) {
+			const files = await listMarkdownDir(ctx.env, `src/content/series/${locale}`);
+			const loaded = await Promise.all(
+				files.map(async (f) => {
+					const slug = f.name.replace(/\.md$/, '');
+					const file = await getRepoFile(ctx.env, seriesPath(locale, slug));
+					if (!file) return null;
+					return { locale, slug, fields: parseSeriesMarkdown(file.content), sha: file.sha };
+				}),
+			);
+			for (const item of loaded) {
+				if (!item) continue;
+				if (item.fields.draft && !ctx.authed) continue;
+				if (wantDraft === true && !item.fields.draft) continue;
+				if (wantDraft === false && item.fields.draft) continue;
+				const { intro: _intro, ...summary } = seriesResource(ctx, item.locale, item.slug, item.fields, { sha: item.sha });
+				series.push(summary);
+			}
+		}
+	} catch (err) {
+		return githubError(ctx.request, err);
+	}
+
+	return json({
+		series,
+		_links: {
+			self: { href: ctx.request.url },
+			collection: { href: abs(ctx.request, '/api/series') },
+			posts: { href: abs(ctx.request, '/api/posts') },
+			api: { href: abs(ctx.request, '/api') },
+			openapi: { href: abs(ctx.request, '/api/openapi.json'), rel: 'service-desc' },
+		},
+	});
+}
+
+async function handleGetSeries(ctx: Ctx): Promise<Response> {
+	const locale = ctx.params.locale;
+	const slug = ctx.params.slug;
+	if (!isLocale(locale)) return errorJson(ctx.request, 400, 'invalid', 'locale must be en or zh');
+	if (!isValidSlug(slug)) return errorJson(ctx.request, 400, 'invalid', 'invalid slug');
+	try {
+		const file = await getRepoFile(ctx.env, seriesPath(locale, slug));
+		if (!file) return errorJson(ctx.request, 404, 'not_found', `Series ${locale}/${slug} not found`);
+		const fields = parseSeriesMarkdown(file.content);
+		if (fields.draft && !ctx.authed) {
+			return errorJson(ctx.request, 401, 'unauthorized', 'Authorization: Bearer CMS_TOKEN required for drafts');
+		}
+		return json(seriesResource(ctx, locale, slug, fields, { sha: file.sha }));
+	} catch (err) {
+		return githubError(ctx.request, err);
+	}
+}
+
+async function handleCreateSeries(ctx: Ctx): Promise<Response> {
+	const body = (await readJson(ctx.request)) as SeriesWriteBody | Response;
+	if (body instanceof Response) return body;
+
+	if (typeof body.locale !== 'string' || !isLocale(body.locale)) {
+		return errorJson(ctx.request, 400, 'invalid', 'locale must be en or zh');
+	}
+	const locale = body.locale;
+	if (typeof body.title !== 'string' || !body.title.trim()) {
+		return errorJson(ctx.request, 400, 'invalid', 'title is required');
+	}
+	if (typeof body.description !== 'string' || !body.description.trim()) {
+		return errorJson(ctx.request, 400, 'invalid', 'description is required');
+	}
+	if (body.intro !== undefined && typeof body.intro !== 'string') {
+		return errorJson(ctx.request, 400, 'invalid', 'intro must be a string');
+	}
+	if (body.status !== undefined && !isSeriesStatus(body.status)) {
+		return errorJson(ctx.request, 400, 'invalid', 'status must be ongoing or completed');
+	}
+	if (body.upNext !== undefined && body.upNext !== null && typeof body.upNext !== 'string') {
+		return errorJson(ctx.request, 400, 'invalid', 'upNext must be a string');
+	}
+
+	let slug = typeof body.slug === 'string' ? body.slug.trim() : '';
+	if (!slug) slug = slugify(body.title);
+	if (!isValidSlug(slug)) {
+		return errorJson(ctx.request, 400, 'invalid', 'slug is required (could not derive a valid slug from title; pass slug explicitly)');
+	}
+
+	const cover = parseCover(ctx.request, body.coverUrl);
+	if (cover instanceof Response) return cover;
+
+	const fields: SeriesFields = {
+		title: body.title.trim(),
+		description: body.description.trim(),
+		status: isSeriesStatus(body.status) ? body.status : 'ongoing',
+		draft: body.draft === undefined ? true : body.draft === true,
+		upNext: typeof body.upNext === 'string' && body.upNext.trim() ? body.upNext.trim() : undefined,
+		cover,
+		body: typeof body.intro === 'string' ? body.intro : '',
+	};
+
+	try {
+		const path = seriesPath(locale, slug);
+		const existing = await getRepoFile(ctx.env, path);
+		if (existing) return errorJson(ctx.request, 409, 'conflict', `Series ${locale}/${slug} already exists`);
+		const result = await putRepoFile(ctx.env, path, serializeSeriesMarkdown(fields), `cms: add series ${locale}/${slug}`);
+		return json(seriesResource(ctx, locale, slug, fields, { sha: result.fileSha, commitSha: result.sha }), 201);
+	} catch (err) {
+		return githubError(ctx.request, err);
+	}
+}
+
+async function handleUpdateSeries(ctx: Ctx): Promise<Response> {
+	const locale = ctx.params.locale;
+	const slug = ctx.params.slug;
+	if (!isLocale(locale)) return errorJson(ctx.request, 400, 'invalid', 'locale must be en or zh');
+	if (!isValidSlug(slug)) return errorJson(ctx.request, 400, 'invalid', 'invalid slug');
+
+	const body = (await readJson(ctx.request)) as SeriesWriteBody | Response;
+	if (body instanceof Response) return body;
+
+	const keys = ['title', 'description', 'intro', 'status', 'draft', 'upNext', 'coverUrl'] as const;
+	if (!keys.some((k) => k in body)) {
+		return errorJson(ctx.request, 400, 'invalid', 'PATCH body must include at least one updatable field');
+	}
+
+	try {
+		const path = seriesPath(locale, slug);
+		const existing = await getRepoFile(ctx.env, path);
+		if (!existing) return errorJson(ctx.request, 404, 'not_found', `Series ${locale}/${slug} not found`);
+		const fields = parseSeriesMarkdown(existing.content);
+
+		if (body.title !== undefined) {
+			if (typeof body.title !== 'string' || !body.title.trim()) {
+				return errorJson(ctx.request, 400, 'invalid', 'title must be a non-empty string');
+			}
+			fields.title = body.title.trim();
+		}
+		if (body.description !== undefined) {
+			if (typeof body.description !== 'string' || !body.description.trim()) {
+				return errorJson(ctx.request, 400, 'invalid', 'description must be a non-empty string');
+			}
+			fields.description = body.description.trim();
+		}
+		if (body.intro !== undefined) {
+			if (typeof body.intro !== 'string') return errorJson(ctx.request, 400, 'invalid', 'intro must be a string');
+			fields.body = body.intro;
+		}
+		if (body.status !== undefined) {
+			if (!isSeriesStatus(body.status)) return errorJson(ctx.request, 400, 'invalid', 'status must be ongoing or completed');
+			fields.status = body.status;
+		}
+		if (body.draft !== undefined) {
+			if (typeof body.draft !== 'boolean') return errorJson(ctx.request, 400, 'invalid', 'draft must be a boolean');
+			fields.draft = body.draft;
+		}
+		if (body.upNext !== undefined) {
+			if (body.upNext === null || body.upNext === '') fields.upNext = undefined;
+			else if (typeof body.upNext !== 'string') return errorJson(ctx.request, 400, 'invalid', 'upNext must be a string');
+			else fields.upNext = body.upNext.trim();
+		}
+		if (body.coverUrl !== undefined) {
+			if (body.coverUrl === null || body.coverUrl === '') fields.cover = undefined;
+			else {
+				const cover = parseCover(ctx.request, body.coverUrl);
+				if (cover instanceof Response) return cover;
+				fields.cover = cover;
+			}
+		}
+
+		const verb = body.draft === true ? 'unpublish' : body.draft === false ? 'publish' : 'update';
+		const result = await putRepoFile(ctx.env, path, serializeSeriesMarkdown(fields), `cms: ${verb} series ${locale}/${slug}`, existing.sha);
+		return json(seriesResource(ctx, locale, slug, fields, { sha: result.fileSha, commitSha: result.sha }));
 	} catch (err) {
 		return githubError(ctx.request, err);
 	}

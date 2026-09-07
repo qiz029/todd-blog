@@ -79,6 +79,22 @@ export function localeSeries(all: Series[], locale: string): Series[] {
 	return all.filter((s) => s.id.startsWith(locale + '/') && !s.data.draft);
 }
 
+/**
+ * Throw when a post names a series with no metadata file at all for its locale.
+ * A *draft* series is fine: its posts simply render without series UI until it
+ * is published, so a series can be prepared before it goes live.
+ */
+function assertSeriesExist(all: Series[], posts: Post[], locale: string): void {
+	const known = new Set(all.filter((s) => s.id.startsWith(locale + '/')).map((s) => seriesSlug(s, locale)));
+	for (const p of posts) {
+		if (p.data.series && !known.has(p.data.series)) {
+			throw new Error(
+				`Post ${p.id} references series "${p.data.series}" but src/content/series/${locale}/${p.data.series}.md does not exist`
+			);
+		}
+	}
+}
+
 /** Posts in one series, in reading order: explicit seriesOrder first, then oldest first. */
 export function seriesPosts(posts: Post[], slug: string): Post[] {
 	return posts
@@ -99,21 +115,13 @@ export interface SeriesSummary {
 }
 
 /**
- * Every series in a locale with its posts, most recently updated first.
+ * Every published series in a locale with its posts, most recently updated first.
  * Throws when a post names a series that has no entry file for that locale,
  * so a typo fails the build instead of silently dropping the post.
  */
 export function seriesSummaries(all: Series[], posts: Post[], locale: string): SeriesSummary[] {
-	const entries = localeSeries(all, locale);
-	const known = new Set(entries.map((s) => seriesSlug(s, locale)));
-	for (const p of posts) {
-		if (p.data.series && !known.has(p.data.series)) {
-			throw new Error(
-				`Post ${p.id} references series "${p.data.series}" but src/content/series/${locale}/${p.data.series}.md does not exist`
-			);
-		}
-	}
-	return entries
+	assertSeriesExist(all, posts, locale);
+	return localeSeries(all, locale)
 		.map((entry) => {
 			const slug = seriesSlug(entry, locale);
 			const list = seriesPosts(posts, slug);
@@ -150,12 +158,9 @@ export function seriesContext(
 ): SeriesContext | undefined {
 	const slug = current.data.series;
 	if (!slug) return undefined;
+	assertSeriesExist(all, [current], locale);
 	const entry = localeSeries(all, locale).find((s) => seriesSlug(s, locale) === slug);
-	if (!entry) {
-		throw new Error(
-			`Post ${current.id} references series "${slug}" but src/content/series/${locale}/${slug}.md does not exist`
-		);
-	}
+	if (!entry) return undefined; // draft series: no series UI yet
 	const list = seriesPosts(posts, slug);
 	const i = list.findIndex((p) => p.id === current.id);
 	return {

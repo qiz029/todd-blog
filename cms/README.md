@@ -10,7 +10,7 @@ freeze endpoint lists in local docs or skills.
     curl -sS -D - -o /dev/null https://toddzheng.net/api
     curl -sS https://toddzheng.net/api/openapi.json
 
-The discovery JSON has `_links` (self, openapi with rel=service-desc, posts, media).
+The discovery JSON has `_links` (self, openapi with rel=service-desc, posts, series, media).
 The same relations are also sent as HTTP Link headers.
 
 Follow `_links` on every JSON resource (self, collection, html, sibling locale, media).
@@ -28,6 +28,10 @@ Git history is not deleted.
       -H "Authorization: Bearer $CMS_TOKEN" \
       -H "Content-Type: application/json" \
       -d '{"locale":"en","title":"Working title","description":"One-line summary","body":"Markdown body. Images: ![alt](/media/key).","tags":["draft"]}'
+
+Series (ordered reading lists) are a resource too: POST /api/series creates
+src/content/series/{locale}/{slug}.md as a draft, PATCH draft=false publishes it,
+and posts join with `series` + `seriesOrder`. See the live OpenAPI for bodies.
 
 Upload a hero image, then reference /media/{key}:
 

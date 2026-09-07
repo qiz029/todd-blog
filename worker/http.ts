@@ -35,15 +35,17 @@ export function errorJson(
 	message: string,
 	extra?: Record<string, unknown>,
 ): Response {
+	const { _links: extraLinks, ...rest } = (extra ?? {}) as Record<string, unknown> & { _links?: Record<string, unknown> };
 	return json(
 		{
 			error: code,
 			message,
-			...extra,
+			...rest,
 			_links: {
 				self: { href: request.url },
 				api: { href: abs(request, '/api') },
 				openapi: { href: abs(request, '/api/openapi.json'), rel: 'service-desc' },
+				...(extraLinks ?? {}),
 			},
 		},
 		status,
@@ -92,5 +94,23 @@ export function postLinks(request: Request, locale: Locale, slug: string) {
 		html: { href: abs(request, htmlPath(locale, slug)) },
 		sibling: { href: abs(request, postApiPath(otherLocale(locale), slug)) },
 		media: { href: abs(request, '/api/media') },
+	};
+}
+
+export function seriesHtmlPath(locale: string, slug: string): string {
+	return `/${locale}/series/${slug}/`;
+}
+
+export function seriesApiPath(locale: string, slug: string): string {
+	return `/api/series/${locale}/${slug}`;
+}
+
+export function seriesLinks(request: Request, locale: Locale, slug: string) {
+	return {
+		self: { href: abs(request, seriesApiPath(locale, slug)) },
+		collection: { href: abs(request, '/api/series') },
+		html: { href: abs(request, seriesHtmlPath(locale, slug)) },
+		sibling: { href: abs(request, seriesApiPath(otherLocale(locale), slug)) },
+		posts: { href: abs(request, `/api/posts?locale=${locale}&series=${encodeURIComponent(slug)}`) },
 	};
 }
