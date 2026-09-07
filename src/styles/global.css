@@ -62,6 +62,24 @@ p { margin-bottom: 1em; }
 
 .prose p { margin-bottom: 2em; }
 
+/* Inline highlights in Markdown and MDX: <mark>text</mark>. */
+mark {
+  --highlight-color: #f0d675;
+  background: linear-gradient(to bottom, transparent 48%, color-mix(in srgb, var(--highlight-color) 55%, transparent) 48%, color-mix(in srgb, var(--highlight-color) 55%, transparent) 92%, transparent 92%);
+  color: inherit;
+  padding: 0.06em 0.18em;
+  border-radius: 0.15em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+mark[data-color="green"] { --highlight-color: #a9d9b0; }
+mark[data-color="blue"] { --highlight-color: #a9cffa; }
+mark[data-color="pink"] { --highlight-color: #efb5ce; }
+
+.prose mark a { color: inherit; text-decoration: underline; }
+.prose mark a:hover { color: inherit; }
+
 textarea, input {
   font-size: 16px;
   background: var(--bg-card);
@@ -114,6 +132,19 @@ hr {
 
 /* Chinese paragraphs run shorter — tighten the vertical rhythm a bit */
 html:lang(zh-CN) .prose p { margin-bottom: 1.4em; }
+
+/* Give Chinese editorial headings a quieter scale and a lighter stroke. */
+html:lang(zh-CN) {
+  --zh-title-size: clamp(1.9rem, 4.5vw, 2.6rem);
+}
+
+html:lang(zh-CN) main :is(h1, h2, h3, h4, h5, h6) {
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+html:lang(zh-CN) main h1 { font-size: var(--zh-title-size); }
 
 /* Heading anchor links (rehype-autolink-headings) */
 .prose .heading-anchor {

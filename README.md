@@ -64,3 +64,16 @@ This theme is based off of the lovely [Bear Blog](https://github.com/HermanMarti
 
 ## CMS
 GET /api then follow OpenAPI; never use a CLI. See cms/README.md.
+
+## Text highlights
+
+Use inline HTML in Markdown or MDX (including CMS post bodies):
+
+```html
+This is <mark>highlighted in yellow</mark>.
+<mark data-color="green">Green highlight</mark>
+<mark data-color="blue">Blue highlight</mark>
+<mark data-color="pink">Pink highlight</mark>
+```
+
+Highlights wrap across lines. The `==text==` shorthand is not supported.
