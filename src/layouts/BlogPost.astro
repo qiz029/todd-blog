@@ -16,6 +16,16 @@ interface PostLink {
   description?: string;
 }
 
+interface SeriesLink {
+  title: string;
+  href: string;
+  index: number;
+  total: number;
+  prev?: PostLink;
+  next?: PostLink;
+  parts: (PostLink & { current: boolean })[];
+}
+
 type Props = CollectionEntry<'blog'>['data'] & {
   id: string;
   locale?: string;
@@ -24,6 +34,7 @@ type Props = CollectionEntry<'blog'>['data'] & {
   older?: PostLink;
   newer?: PostLink;
   related?: PostLink[];
+  seriesInfo?: SeriesLink;
 };
 
 const {
@@ -40,7 +51,22 @@ const {
   older,
   newer,
   related = [],
+  seriesInfo,
 } = Astro.props;
+
+// "Part {i} of {n} in {series}" split around the {series} placeholder so the title can be a link.
+const bannerParts = seriesInfo
+  ? t('series.banner', locale)
+      .replace('{i}', String(seriesInfo.index))
+      .replace('{n}', String(seriesInfo.total))
+      .split('{series}')
+  : [];
+
+// Inside a series, prev/next follow reading order; otherwise chronological neighbours.
+const navPrev = seriesInfo ? seriesInfo.prev : older;
+const navNext = seriesInfo ? seriesInfo.next : newer;
+const navPrevLabel = t(seriesInfo ? 'series.prev' : 'post.older', locale);
+const navNextLabel = t(seriesInfo ? 'series.next' : 'post.newer', locale);
 
 // Astro extracts heading text after rehype-autolink-headings appends its '#' — strip it.
 const tocHeadings = headings
@@ -148,6 +174,93 @@ const shareLinks = [
       .tags a:hover {
         color: var(--accent);
         border-color: var(--accent);
+      }
+
+      /* ── Series banner ── */
+      .series-banner {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6em;
+        margin-top: 1.25em;
+        padding: 0.45em 0.9em;
+        font-size: 0.82em;
+        color: var(--text-muted);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 4px;
+        text-align: left;
+        line-height: 1.5;
+      }
+      .series-banner .sb-label {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.85em;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .series-banner a {
+        color: var(--text);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .series-banner a:hover { color: var(--accent); }
+      .series-footer {
+        margin-top: 2.5em;
+        padding: 1.25em 1.5em;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+      }
+      .series-footer .sf-label {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.75em;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.4em;
+      }
+      .series-footer .sf-title {
+        font-family: var(--font-space-grotesk);
+        font-weight: 700;
+        font-size: 1.1em;
+        margin-bottom: 0.6em;
+      }
+      .series-footer ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 0.88em;
+      }
+      .series-footer li {
+        display: flex;
+        gap: 0.7em;
+        padding: 0.3em 0;
+        line-height: 1.5;
+      }
+      .series-footer li .n {
+        font-family: var(--font-jetbrains), monospace;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+      .series-footer li a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .series-footer li a:hover { color: var(--accent); }
+      .series-footer li.current .n { color: var(--accent); }
+      .series-footer li.current span:last-child {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .series-footer .sf-all {
+        display: inline-block;
+        margin-top: 0.8em;
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.8em;
       }
 
       /* ── Table of contents (wide screens only) ── */
@@ -404,6 +517,14 @@ const shareLinks = [
                   ))}
                 </div>
               )}
+              {seriesInfo && (
+                <div class="series-banner">
+                  <span class="sb-label">{t('series.heading', locale)}</span>
+                  <span>
+                    {bannerParts[0]}<a href={seriesInfo.href}>{seriesInfo.title}</a>{bannerParts[1]}
+                  </span>
+                </div>
+              )}
               <hr />
             </div>
             <slot />
@@ -434,6 +555,22 @@ const shareLinks = [
                 </div>
               </div>
 
+              {seriesInfo && seriesInfo.total > 1 && (
+                <div class="series-footer">
+                  <div class="sf-label">{t('series.heading', locale)}</div>
+                  <div class="sf-title">{seriesInfo.title}</div>
+                  <ol>
+                    {seriesInfo.parts.map((part, i) => (
+                      <li class:list={[part.current && 'current']}>
+                        <span class="n">{String(i + 1).padStart(2, '0')}</span>
+                        {part.current ? <span>{part.title}</span> : <a href={part.href}>{part.title}</a>}
+                      </li>
+                    ))}
+                  </ol>
+                  <a class="sf-all" href={seriesInfo.href}>{t('series.viewAll', locale)} →</a>
+                </div>
+              )}
+
               {related.length > 0 && (
                 <div class="read-next">
                   <h2>{t('post.readNext', locale)}</h2>
@@ -450,18 +587,18 @@ const shareLinks = [
                 </div>
               )}
 
-              {(older || newer) && (
+              {(navPrev || navNext) && (
                 <nav class="post-nav">
-                  {older && (
-                    <a href={older.href} class="older">
-                      <span class="dir">← {t('post.older', locale)}</span>
-                      <span class="pn-title">{older.title}</span>
+                  {navPrev && (
+                    <a href={navPrev.href} class="older">
+                      <span class="dir">← {navPrevLabel}</span>
+                      <span class="pn-title">{navPrev.title}</span>
                     </a>
                   )}
-                  {newer && (
-                    <a href={newer.href} class="newer">
-                      <span class="dir">{t('post.newer', locale)} →</span>
-                      <span class="pn-title">{newer.title}</span>
+                  {navNext && (
+                    <a href={navNext.href} class="newer">
+                      <span class="dir">{navNextLabel} →</span>
+                      <span class="pn-title">{navNext.title}</span>
                     </a>
                   )}
                 </nav>

@@ -145,6 +145,34 @@ const dict: Record<string, Record<string, string>> = {
     zh: '资深软件工程师 & 技术负责人。写 AI 工程、开发者工具，以及规模化软件建设中那些混乱的部分。',
   },
 
+  // Series
+  'nav.series':           { en: 'Series',      zh: '专栏' },
+  'series.heading':       { en: 'Series',      zh: '专栏' },
+  'series.allSeries':     { en: 'All series',  zh: '全部专栏' },
+  'series.intro': {
+    en: 'Longer arcs of writing, meant to be read in order. Each series collects a set of posts around one question.',
+    zh: '围绕一个问题展开的一组文章，按顺序阅读效果更好。',
+  },
+  'series.meta': {
+    en: 'Multi-part series by Todd Zheng — collections of posts meant to be read in order.',
+    zh: 'Todd Zheng 的专栏——围绕一个主题、按顺序阅读的系列文章。',
+  },
+  'series.ongoing':       { en: 'Ongoing',     zh: '连载中' },
+  'series.completed':     { en: 'Completed',   zh: '已完结' },
+  'series.count':         { en: '{n} parts',   zh: '{n} 篇' },
+  'series.updated':       { en: 'Updated',     zh: '更新于' },
+  'series.totalTime':     { en: '{min} min total', zh: '共约 {min} 分钟' },
+  'series.readingOrder':  { en: 'Reading order', zh: '阅读顺序' },
+  'series.start':         { en: 'Start from part 1', zh: '从第一篇开始读' },
+  'series.upNext':        { en: 'Up next',     zh: '下一篇计划' },
+  'series.empty':         { en: 'No posts in this series yet.', zh: '这个专栏还没有文章。' },
+  'series.none':          { en: 'No series yet.', zh: '还没有专栏。' },
+  // {series} is replaced by a link to the series page.
+  'series.banner':        { en: 'Part {i} of {n} in {series}', zh: '《{series}》专栏第 {i} 篇 · 共 {n} 篇' },
+  'series.prev':          { en: 'Previous in series', zh: '专栏上一篇' },
+  'series.next':          { en: 'Next in series',     zh: '专栏下一篇' },
+  'series.viewAll':       { en: 'View the whole series', zh: '查看专栏全部文章' },
+
   // Tags
   'tags.heading': { en: 'Tags', zh: '标签' },
   'tags.allTags': { en: 'All tags', zh: '全部标签' },

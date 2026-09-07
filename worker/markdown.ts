@@ -8,6 +8,9 @@ export interface PostFields {
 	heroImage?: string;
 	tags: string[];
 	draft: boolean;
+	/** Series slug (kebab-case) and 1-based reading position. */
+	series?: string;
+	seriesOrder?: number;
 	body: string;
 }
 
@@ -86,8 +89,16 @@ export function parseMarkdown(raw: string): PostFields {
 		heroImage: data.heroImage ? String(data.heroImage) : undefined,
 		tags,
 		draft: data.draft === true || data.draft === 'true',
+		series: data.series ? String(data.series) : undefined,
+		seriesOrder: parseSeriesOrder(data.seriesOrder),
 		body: body.replace(/^\r?\n/, ''),
 	};
+}
+
+function parseSeriesOrder(value: unknown): number | undefined {
+	if (value === undefined || value === '') return undefined;
+	const n = typeof value === 'number' ? value : Number(String(value));
+	return Number.isInteger(n) && n > 0 ? n : undefined;
 }
 
 function parseScalar(rawVal: string): unknown {
@@ -128,6 +139,8 @@ export function serializeMarkdown(fields: PostFields): string {
 	if (fields.heroImage) lines.push('heroImage: ' + yamlQuote(fields.heroImage));
 	lines.push('tags: [' + fields.tags.map((t) => JSON.stringify(t)).join(', ') + ']');
 	if (fields.draft) lines.push('draft: true');
+	if (fields.series) lines.push('series: ' + fields.series);
+	if (fields.series && fields.seriesOrder) lines.push('seriesOrder: ' + fields.seriesOrder);
 	lines.push('---');
 	lines.push('');
 	const body = fields.body.replace(/^\n+/, '').replace(/\s+$/, '');

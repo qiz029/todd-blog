@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../../layouts/BlogPost.astro';
-import { localePosts, postNav, postUrl, readingStats } from '../../../lib/blog';
+import { localePosts, postNav, postUrl, readingStats, seriesContext } from '../../../lib/blog';
 
 export async function getStaticPaths() {
   const locale = 'zh';
@@ -27,6 +27,16 @@ const toLink = (p: CollectionEntry<'blog'>) => ({
   href: postUrl(p, locale),
   description: p.data.description,
 });
+const series = seriesContext(await getCollection('series'), sorted, post, locale);
+const seriesInfo = series && {
+  title: series.entry.data.title,
+  href: series.href,
+  index: series.index,
+  total: series.total,
+  prev: series.prev && toLink(series.prev),
+  next: series.next && toLink(series.next),
+  parts: series.posts.map((p) => ({ ...toLink(p), current: p.id === post.id })),
+};
 ---
 
 <BlogPost
@@ -38,6 +48,7 @@ const toLink = (p: CollectionEntry<'blog'>) => ({
   older={older && toLink(older)}
   newer={newer && toLink(newer)}
   related={related.map(toLink)}
+  seriesInfo={seriesInfo}
 >
   <Content />
 </BlogPost>

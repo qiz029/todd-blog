@@ -130,6 +130,28 @@ describe('markdown', () => {
 		expect(parsed.body.trim()).toBe('Hello.');
 	});
 
+	it('round-trips series membership and drops seriesOrder without a series', () => {
+		const md = serializeMarkdown({
+			title: 'Part two',
+			description: 'd',
+			pubDate: '2026-05-11',
+			tags: [],
+			draft: false,
+			series: 'ai-era',
+			seriesOrder: 2,
+			body: '',
+		});
+		expect(md).toContain('series: ai-era');
+		expect(md).toContain('seriesOrder: 2');
+		const parsed = parseMarkdown(md);
+		expect(parsed.series).toBe('ai-era');
+		expect(parsed.seriesOrder).toBe(2);
+
+		const orphan = serializeMarkdown({ title: 't', description: 'd', pubDate: '2026-05-11', tags: [], draft: false, seriesOrder: 3, body: '' });
+		expect(orphan).not.toContain('seriesOrder');
+		expect(parseMarkdown(orphan).series).toBeUndefined();
+	});
+
 	it('slugifies titles', () => {
 		expect(slugify('Hello World!')).toBe('hello-world');
 	});

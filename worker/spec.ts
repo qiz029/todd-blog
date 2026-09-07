@@ -212,6 +212,11 @@ const schemas = {
 			updatedDate: { type: 'string', format: 'date' },
 			draft: { type: 'boolean', default: true },
 			heroImageUrl: { type: 'string', description: 'Typically /media/{key}' },
+			series: {
+				type: 'string',
+				description: 'Series slug (kebab-case). Must match an existing src/content/series/{locale}/{slug}.md or the site build fails.',
+			},
+			seriesOrder: { type: 'integer', minimum: 1, description: '1-based reading position within the series' },
 		},
 	},
 	UpdatePost: {
@@ -225,6 +230,8 @@ const schemas = {
 			updatedDate: { type: 'string', format: 'date' },
 			draft: { type: 'boolean', description: 'true unpublishes; false publishes' },
 			heroImageUrl: { type: ['string', 'null'] },
+			series: { type: ['string', 'null'], description: 'null removes the post from its series' },
+			seriesOrder: { type: ['integer', 'null'], minimum: 1 },
 		},
 	},
 	Post: {
@@ -240,6 +247,8 @@ const schemas = {
 			updatedDate: { type: 'string' },
 			draft: { type: 'boolean' },
 			heroImage: { type: 'string' },
+			series: { type: ['string', 'null'] },
+			seriesOrder: { type: ['integer', 'null'] },
 			sha: { type: 'string' },
 			commitSha: { type: 'string' },
 			htmlUrl: { type: 'string' },

@@ -1,0 +1,186 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+import { t } from '../i18n/translations';
+import { localePosts, seriesSummaries, seriesUrl } from '../lib/blog';
+
+interface Props {
+  locale: string;
+}
+const { locale } = Astro.props;
+
+const posts = localePosts(await getCollection('blog'), locale);
+const series = seriesSummaries(await getCollection('series'), posts, locale);
+const count = (n: number) => t('series.count', locale).replace('{n}', String(n));
+---
+
+<!doctype html>
+<html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <BaseHead
+      title={`${t('series.heading', locale)} — ${SITE_TITLE}`}
+      description={t('series.meta', locale)}
+    />
+    <style>
+      .page-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1em;
+        flex-wrap: wrap;
+      }
+      .to-blog {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.85em;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .to-blog:hover { color: var(--accent); }
+      .intro {
+        color: var(--text-muted);
+        margin: 0.5em 0 2em 0;
+        max-width: 40em;
+      }
+      .series-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.25em;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .series-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6em;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 1.4em 1.5em 1.25em;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        text-decoration: none;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+      }
+      .series-card:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.7em;
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.72em;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+      .status {
+        padding: 0.1em 0.55em;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+      }
+      .status.ongoing { color: var(--accent-amber); border-color: var(--accent-amber); }
+      .status.completed { color: var(--text-muted); }
+      .card-title {
+        margin: 0;
+        font-size: 1.35em;
+        line-height: 1.25;
+        color: var(--text);
+        font-weight: 700;
+        transition: color 0.2s ease;
+      }
+      .series-card:hover .card-title { color: var(--accent); }
+      .card-desc {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.9em;
+        line-height: 1.55;
+        flex: 1;
+      }
+      .card-parts {
+        list-style: none;
+        margin: 0.4em 0 0 0;
+        padding: 0.8em 0 0 0;
+        border-top: 1px solid var(--border);
+        font-size: 0.82em;
+        color: var(--text-muted);
+      }
+      .card-parts li {
+        display: flex;
+        gap: 0.7em;
+        line-height: 1.5;
+        margin: 0.2em 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .card-parts .n {
+        font-family: var(--font-jetbrains), monospace;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      .card-parts .more {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.9em;
+        opacity: 0.8;
+      }
+      .card-updated {
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.72em;
+        color: var(--text-muted);
+        margin-top: 0.3em;
+      }
+      .empty { color: var(--text-muted); }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <div class="page-header animate-in">
+        <h1>{t('series.heading', locale)}</h1>
+        <a class="to-blog" href={`/${locale}/blog/`}>{t('home.allWriting', locale)} →</a>
+      </div>
+      <p class="intro animate-in">{t('series.intro', locale)}</p>
+
+      {series.length === 0 ? (
+        <p class="empty animate-in">{t('series.none', locale)}</p>
+      ) : (
+        <ul class="series-grid stagger">
+          {series.map(({ entry, slug, posts: list, updated }) => (
+            <li>
+              <a class="series-card" href={seriesUrl(slug, locale)}>
+                <div class="card-meta">
+                  <span class:list={['status', entry.data.status]}>{t(`series.${entry.data.status}`, locale)}</span>
+                  <span>{count(list.length)}</span>
+                </div>
+                <h2 class="card-title">{entry.data.title}</h2>
+                <p class="card-desc">{entry.data.description}</p>
+                {list.length > 0 && (
+                  <ol class="card-parts">
+                    {list.slice(0, 3).map((p, i) => (
+                      <li><span class="n">{String(i + 1).padStart(2, '0')}</span><span>{p.data.title}</span></li>
+                    ))}
+                    {list.length > 3 && <li class="more">+{list.length - 3}</li>}
+                  </ol>
+                )}
+                {updated && (
+                  <div class="card-updated">{t('series.updated', locale)} <FormattedDate date={updated} /></div>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

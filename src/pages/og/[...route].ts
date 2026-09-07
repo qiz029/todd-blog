@@ -1,9 +1,14 @@
 import { getCollection } from 'astro:content';
 import { OGImageRoute } from 'astro-og-canvas';
 
-// One social-card PNG per blog post, served at /og/<locale>/<slug>.png.
+// One social-card PNG per blog post (/og/<locale>/<slug>.png) and per series
+// (/og/<locale>/series/<slug>.png).
 const posts = await getCollection('blog', (entry) => !entry.data.draft);
-const pages = Object.fromEntries(posts.map((post) => [post.id, post.data]));
+const series = await getCollection('series');
+const pages = Object.fromEntries([
+	...posts.map((post) => [post.id, post.data]),
+	...series.map((s) => [s.id.replace('/', '/series/'), s.data]),
+]);
 
 export const { getStaticPaths, GET } = await OGImageRoute({
 	param: 'route',

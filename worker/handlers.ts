@@ -96,6 +96,8 @@ function postResource(
 		updatedDate: fields.updatedDate ?? null,
 		draft: fields.draft,
 		heroImage: fields.heroImage ?? null,
+		series: fields.series ?? null,
+		seriesOrder: fields.seriesOrder ?? null,
 		htmlUrl: htmlPath(locale, slug),
 		...extra,
 		_links: postLinks(ctx.request, locale, slug),
@@ -187,6 +189,8 @@ interface WriteBody {
 	updatedDate?: unknown;
 	draft?: unknown;
 	heroImageUrl?: unknown;
+	series?: unknown;
+	seriesOrder?: unknown;
 }
 
 async function readJson(request: Request): Promise<WriteBody | Response> {
@@ -229,6 +233,23 @@ function parseHero(request: Request, value: unknown): string | undefined | Respo
 	}
 	if (!(value.startsWith('/media/') || /^https?:\/\//.test(value))) {
 		return errorJson(request, 400, 'invalid', 'heroImageUrl must be a /media/... path or an http(s) URL');
+	}
+	return value;
+}
+
+/** Series slug: kebab-case; null/empty clears membership. */
+function parseSeries(request: Request, value: unknown): string | undefined | Response {
+	if (value === undefined || value === null || value === '') return undefined;
+	if (typeof value !== 'string' || !isValidSlug(value.trim())) {
+		return errorJson(request, 400, 'invalid', 'series must be a kebab-case slug (matching src/content/series/<locale>/<slug>.md)');
+	}
+	return value.trim();
+}
+
+function parseSeriesOrder(request: Request, value: unknown): number | undefined | Response {
+	if (value === undefined || value === null || value === '') return undefined;
+	if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
+		return errorJson(request, 400, 'invalid', 'seriesOrder must be a positive integer');
 	}
 	return value;
 }
@@ -277,6 +298,14 @@ async function handleCreatePost(ctx: Ctx): Promise<Response> {
 
 	const draft = body.draft === undefined ? true : body.draft === true;
 
+	const series = parseSeries(ctx.request, body.series);
+	if (series instanceof Response) return series;
+	const seriesOrder = parseSeriesOrder(ctx.request, body.seriesOrder);
+	if (seriesOrder instanceof Response) return seriesOrder;
+	if (seriesOrder !== undefined && !series) {
+		return errorJson(ctx.request, 400, 'invalid', 'seriesOrder requires series');
+	}
+
 	const fields: PostFields = {
 		title: body.title.trim(),
 		description: body.description.trim(),
@@ -285,6 +314,8 @@ async function handleCreatePost(ctx: Ctx): Promise<Response> {
 		heroImage,
 		tags: tags as string[],
 		draft,
+		series,
+		seriesOrder,
 		body: body.body,
 	};
 
@@ -310,7 +341,7 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 	const body = await readJson(ctx.request);
 	if (body instanceof Response) return body;
 
-	const keys = ['title', 'description', 'body', 'tags', 'pubDate', 'updatedDate', 'draft', 'heroImageUrl'] as const;
+	const keys = ['title', 'description', 'body', 'tags', 'pubDate', 'updatedDate', 'draft', 'heroImageUrl', 'series', 'seriesOrder'] as const;
 	if (!keys.some((k) => k in body)) {
 		return errorJson(ctx.request, 400, 'invalid', 'PATCH body must include at least one updatable field');
 	}
@@ -364,6 +395,21 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 				if (heroImage instanceof Response) return heroImage;
 				fields.heroImage = heroImage;
 			}
+		}
+
+		if (body.series !== undefined) {
+			const series = parseSeries(ctx.request, body.series);
+			if (series instanceof Response) return series;
+			fields.series = series;
+			if (!series) fields.seriesOrder = undefined;
+		}
+		if (body.seriesOrder !== undefined) {
+			const seriesOrder = parseSeriesOrder(ctx.request, body.seriesOrder);
+			if (seriesOrder instanceof Response) return seriesOrder;
+			if (seriesOrder !== undefined && !fields.series) {
+				return errorJson(ctx.request, 400, 'invalid', 'seriesOrder requires series');
+			}
+			fields.seriesOrder = seriesOrder;
 		}
 
 		fields.updatedDate = fields.updatedDate ?? todayUTC();
