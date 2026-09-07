@@ -7,6 +7,9 @@ const dict: Record<string, Record<string, string>> = {
   'nav.blog':       { en: 'Blog',       zh: '文章' },
   'nav.about':      { en: 'About',      zh: '关于' },
   'nav.projects':   { en: 'Projects',   zh: '项目' },
+  'rss.link': { en: 'Subscribe via RSS', zh: 'RSS 订阅' },
+  'rss.heading': { en: 'Keep up with new writing', zh: '订阅新文章' },
+  'rss.description': { en: 'Get new article summaries in your RSS reader. Add the feed address below to subscribe.', zh: '在 RSS 阅读器里接收新文章摘要。将下方地址添加到阅读器，即可订阅。' },
 
   // Home page
   'home.heading':   { en: 'Todd Zheng', zh: 'Todd Zheng' },

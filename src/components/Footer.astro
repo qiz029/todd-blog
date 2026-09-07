@@ -1,9 +1,18 @@
 ---
+import { t } from '../i18n/translations';
 const today = new Date();
-const { locale } = Astro.props;
+const { locale = 'en' } = Astro.props;
+const feedPath = `/${locale}/rss.xml`;
+const feedURL = new URL(feedPath, Astro.site).href;
 ---
 
 <footer>
+  <section class="rss-subscribe" aria-label={t('rss.heading', locale)}>
+    <div class="rss-heading">{t('rss.heading', locale)}</div>
+    <p>{t('rss.description', locale)}</p>
+    <a class="rss-button" href={feedPath} type="application/rss+xml">{t('rss.link', locale)} <span aria-hidden="true">↗</span></a>
+    <span class="feed-address">{feedURL}</span>
+  </section>
   <hr />
   <div class="footer-content">
     <span>&copy; {today.getFullYear()} Todd Zheng</span>
@@ -11,11 +20,32 @@ const { locale } = Astro.props;
       <a href="mailto:toddzheng024@gmail.com">Email</a>
       <a href="https://www.linkedin.com/in/toddzheng-024/" target="_blank">LinkedIn</a>
       <a href="https://x.com/ShiZheng24517" target="_blank" rel="noopener">X</a>
-      <a href={`/${locale || 'en'}/rss.xml`}>RSS</a>
     </div>
   </div>
 </footer>
 <style>
+  .rss-subscribe {
+    padding: 1.5em;
+    margin-bottom: 2em;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-amber);
+    border-radius: 6px;
+    background: var(--bg-card);
+  }
+  .rss-heading { font-size: 1.15em; font-weight: 500; color: var(--text); }
+  .rss-subscribe p { color: var(--text-muted); font-size: 0.9em; margin: 0.6em 0 1.2em; }
+  .rss-button {
+    display: inline-flex;
+    gap: 0.7em;
+    padding: 0.45em 0.85em;
+    border: 1px solid var(--accent-amber);
+    border-radius: 4px;
+    color: var(--accent-amber);
+    font-size: 0.85em;
+  }
+  .rss-button:hover { background: var(--accent-amber); color: var(--bg); }
+  .rss-button:focus-visible { outline: 2px solid var(--accent-amber); outline-offset: 4px; }
+  .feed-address { display: block; margin-top: 0.8em; color: var(--text-muted); font-size: 0.75em; overflow-wrap: anywhere; user-select: all; }
   footer {
     padding: 2em 1em 6em 1em;
     max-width: 800px;
