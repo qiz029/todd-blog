@@ -62,6 +62,19 @@ p { margin-bottom: 1em; }
 
 .prose p { margin-bottom: 2em; }
 
+/* Markdown captions: an italic paragraph after an image or image table. */
+.prose :is(p:has(> img:only-child), table:has(img)) + p:has(> em:only-child),
+.prose table:has(img) td:has(> em:only-child),
+.prose figcaption {
+  font-size: 0.75em;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.prose p:has(> img:only-child):has(+ p > em:only-child) {
+  margin-bottom: 0.5rem;
+}
+
 /* Inline highlights in Markdown and MDX: <mark>text</mark>. */
 mark {
   --highlight-color: #f0d675;
