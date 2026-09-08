@@ -1,7 +1,8 @@
 ---
 title: "Dotcom编年史 (一)：万维网从一个找资料的问题开始"
 description: "1989 年，CERN 的人员流动让资料和能解释资料的人分开。Berners-Lee 从这个找资料的问题出发，写出提案、浏览器和第一个网站，并在 1991 年把邀请发到了外面。"
-pubDate: 2026-09-07
+pubDate: 2026-09-08T00:56:59.371Z
+updatedDate: 2026-09-08
 tags: ["互联网历史", "Dotcom", "科技史", "万维网"]
 series: dotcom-chronicles
 seriesOrder: 2
