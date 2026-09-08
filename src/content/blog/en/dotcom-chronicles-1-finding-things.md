@@ -1,7 +1,8 @@
 ---
 title: "Dotcom Chronicles (1): The Web Began with a Problem of Finding Things"
 description: "In 1989, turnover at CERN kept separating documents from the people who could explain them. Starting from that problem, Berners-Lee wrote a proposal, a browser, and the first website, and in 1991 sent the invitation out."
-pubDate: 2026-09-07
+pubDate: 2026-09-08T00:56:59.371Z
+updatedDate: 2026-09-08
 tags: ["Internet History", "Dotcom", "History of Technology", "World Wide Web"]
 series: dotcom-chronicles
 seriesOrder: 2
