@@ -626,7 +626,33 @@ const shareLinks = [
     <Footer locale={locale} />
 
     <script>
+      let highlightObserver: IntersectionObserver | undefined;
+
+      function initHighlights() {
+        highlightObserver?.disconnect();
+        const marks = document.querySelectorAll<HTMLElement>('.prose mark');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            !('IntersectionObserver' in window)) return;
+
+        highlightObserver = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            (entry.target as HTMLElement).dataset.highlightReveal = 'visible';
+            highlightObserver?.unobserve(entry.target);
+          }
+        }, { rootMargin: '0px 0px -15% 0px', threshold: 0 });
+
+        marks.forEach((mark) => {
+          if (mark.dataset.highlightReveal === 'visible') return;
+          mark.dataset.highlightReveal = 'pending';
+          highlightObserver!.observe(mark);
+        });
+      }
+
+      document.addEventListener('astro:before-swap', () => highlightObserver?.disconnect());
+
       function initPost() {
+        initHighlights();
         const zh = document.documentElement.lang.startsWith('zh');
 
         // Code block toolbar: language label + copy button

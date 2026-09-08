@@ -79,6 +79,8 @@ p { margin-bottom: 1em; }
 mark {
   --highlight-color: #f0d675;
   background: linear-gradient(to bottom, transparent 48%, color-mix(in srgb, var(--highlight-color) 55%, transparent) 48%, color-mix(in srgb, var(--highlight-color) 55%, transparent) 92%, transparent 92%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   color: inherit;
   padding: 0.06em 0.18em;
   border-radius: 0.15em;
@@ -89,6 +91,17 @@ mark {
 mark[data-color="green"] { --highlight-color: #a9d9b0; }
 mark[data-color="blue"] { --highlight-color: #a9cffa; }
 mark[data-color="pink"] { --highlight-color: #efb5ce; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .prose mark[data-highlight-reveal] {
+    background-size: 0% 100%;
+    transition: background-size 850ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .prose mark[data-highlight-reveal="visible"] {
+    background-size: 100% 100%;
+  }
+}
 
 .prose mark a { color: inherit; text-decoration: underline; }
 .prose mark a:hover { color: inherit; }
