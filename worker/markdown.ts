@@ -32,9 +32,13 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export function isValidDate(value: string): boolean {
-	if (!DATE_RE.test(value)) return false;
-	const d = new Date(value + 'T00:00:00Z');
-	return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
+	const day = value.slice(0, 10);
+	if (!DATE_RE.test(day)) return false;
+	const d = new Date(day + 'T00:00:00Z');
+	if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== day) return false;
+	if (value === day) return true;
+	return /^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.test(value)
+		&& !Number.isNaN(Date.parse(value));
 }
 
 export function todayUTC(): string {

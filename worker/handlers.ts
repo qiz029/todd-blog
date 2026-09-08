@@ -242,7 +242,7 @@ function parseTags(request: Request, value: unknown): string[] | Response {
 function parseOptionalDate(request: Request, value: unknown, name: string): string | undefined | Response {
 	if (value === undefined || value === null || value === '') return undefined;
 	if (typeof value !== 'string' || !isValidDate(value)) {
-		return errorJson(request, 400, 'invalid', `${name} must be YYYY-MM-DD`);
+		return errorJson(request, 400, 'invalid', `${name} must be YYYY-MM-DD or an ISO 8601 timestamp with timezone`);
 	}
 	return value;
 }
@@ -317,9 +317,9 @@ async function handleCreatePost(ctx: Ctx): Promise<Response> {
 	const tags = parseTags(ctx.request, body.tags);
 	if (tags instanceof Response) return tags;
 
-	const pubDate = body.pubDate === undefined ? todayUTC() : parseOptionalDate(ctx.request, body.pubDate, 'pubDate');
+	const pubDate = body.pubDate === undefined ? new Date().toISOString() : parseOptionalDate(ctx.request, body.pubDate, 'pubDate');
 	if (pubDate instanceof Response) return pubDate;
-	if (!pubDate) return errorJson(ctx.request, 400, 'invalid', 'pubDate must be YYYY-MM-DD');
+	if (!pubDate) return errorJson(ctx.request, 400, 'invalid', 'pubDate must be YYYY-MM-DD or an ISO 8601 timestamp with timezone');
 
 	const updatedDate = parseOptionalDate(ctx.request, body.updatedDate, 'updatedDate');
 	if (updatedDate instanceof Response) return updatedDate;
@@ -410,7 +410,7 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 		if (body.pubDate !== undefined) {
 			const pubDate = parseOptionalDate(ctx.request, body.pubDate, 'pubDate');
 			if (pubDate instanceof Response) return pubDate;
-			if (!pubDate) return errorJson(ctx.request, 400, 'invalid', 'pubDate must be YYYY-MM-DD');
+			if (!pubDate) return errorJson(ctx.request, 400, 'invalid', 'pubDate must be YYYY-MM-DD or an ISO 8601 timestamp with timezone');
 			fields.pubDate = pubDate;
 		}
 		if (body.updatedDate !== undefined) {

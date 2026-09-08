@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { handleRequest } from './index';
-import { parseMarkdown, parseSeriesMarkdown, serializeMarkdown, serializeSeriesMarkdown, slugify } from './markdown';
+import { parseMarkdown, parseSeriesMarkdown, serializeMarkdown, serializeSeriesMarkdown, slugify, isValidDate } from './markdown';
 import { utf8ToBase64, base64ToUtf8 } from './github';
 
 const TOKEN = 'test-cms-token';
@@ -110,6 +110,15 @@ function req(path: string, init?: RequestInit) {
 }
 
 describe('markdown', () => {
+	it('accepts precise timestamps and legacy dates, rejecting ambiguous or impossible times', () => {
+		for (const value of ['2026-09-07', '2026-09-07T23:15:42.123Z', '2026-09-07T16:15:42-07:00']) {
+			expect(isValidDate(value)).toBe(true);
+		}
+		for (const value of ['2026-02-30', '2026-02-30T12:00:00Z', '2026-09-07T12:00:00', '2026-09-07T24:00:00Z']) {
+			expect(isValidDate(value)).toBe(false);
+		}
+	});
+
 	it('round-trips quoted titles and tags arrays', () => {
 		const md = serializeMarkdown({
 			title: "The AI Era Doesn't Need Code Monkeys",
@@ -336,6 +345,7 @@ describe('CMS worker', () => {
 		expect(stored!.content).toContain('draft: true');
 		expect(stored!.content).toContain('title: "New Piece"');
 		expect(stored!.content).toContain('tags: ["cms"]');
+		expect(parseMarkdown(stored!.content).pubDate).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
 	});
 
 	it('returns 409 when creating a duplicate slug', async () => {
@@ -379,6 +389,17 @@ describe('CMS worker', () => {
 		expect(body.title).toBe('Unlisted');
 		expect(body.commitSha).toMatch(/^commit-/);
 		expect(files.get('src/content/blog/en/published.md')!.content).toContain('draft: true');
+	});
+
+	it('PATCH preserves the exact publication timestamp through storage and response', async () => {
+		const pubDate = '2026-09-07T16:15:42.123-07:00';
+		const res = await handleRequest(req('/api/posts/en/published', auth({
+			method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ pubDate }),
+		})), env);
+		expect(res.status).toBe(200);
+		expect(await res.json()).toMatchObject({ pubDate });
+		expect(parseMarkdown(files.get('src/content/blog/en/published.md')!.content).pubDate).toBe(pubDate);
 	});
 
 	it('uploads an image to R2 and serves it at /media/{key}', async () => {

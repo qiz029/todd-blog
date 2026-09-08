@@ -159,6 +159,30 @@ hr {
 /* Chinese paragraphs run shorter — tighten the vertical rhythm a bit */
 html:lang(zh-CN) .prose p { margin-bottom: 1.4em; }
 
+/* Endnotes share the quieter scale of image captions. */
+.prose .footnotes {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75em;
+  line-height: 1.6;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.prose .footnotes ol {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+.prose .footnotes li + li {
+  margin-top: 0.6em;
+}
+
+html .prose .footnotes p {
+  margin: 0.4em 0;
+}
+
 /* Give Chinese editorial headings a quieter scale and a lighter stroke. */
 html:lang(zh-CN) {
   --zh-title-size: clamp(1.9rem, 4.5vw, 2.6rem);
