@@ -4,7 +4,6 @@ description: "1992 年，一个在得州做文档工具的工程师在邮件列�
 pubDate: 2026-09-09T04:40:18Z
 updatedDate: 2026-09-09
 tags: ["互联网历史", "Dotcom", "科技史", "万维网", "HTML"]
-draft: true
 series: dotcom-chronicles
 seriesOrder: 4
 ---
