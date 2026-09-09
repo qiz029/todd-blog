@@ -4,7 +4,6 @@ description: "1991 年 12 月，一台免费送来的 Web 服务器在 SLAC 图�
 pubDate: 2026-09-09T04:39:18Z
 updatedDate: 2026-09-09
 tags: ["互联网历史", "Dotcom", "科技史", "万维网"]
-draft: true
 series: dotcom-chronicles
 seriesOrder: 3
 ---
