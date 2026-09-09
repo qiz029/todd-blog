@@ -4,7 +4,6 @@ description: "In 1992 an engineer building documentation tools in Texas kept ask
 pubDate: 2026-09-09T04:40:18Z
 updatedDate: 2026-09-09
 tags: ["Internet History", "Dotcom", "History of Technology", "World Wide Web", "HTML"]
-draft: true
 series: dotcom-chronicles
 seriesOrder: 4
 ---
