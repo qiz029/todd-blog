@@ -4,7 +4,6 @@ description: "In December 1991 a free Web server came up on a library account at
 pubDate: 2026-09-09T04:39:18Z
 updatedDate: 2026-09-09
 tags: ["Internet History", "Dotcom", "History of Technology", "World Wide Web"]
-draft: true
 series: dotcom-chronicles
 seriesOrder: 3
 ---
