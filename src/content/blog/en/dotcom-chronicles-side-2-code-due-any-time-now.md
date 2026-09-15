@@ -3,7 +3,7 @@ title: "Dotcom Chronicles, Side Story 2: Code Is Due Out \"Any Time Now\""
 description: "In 1992 CERN's website said the code for Xanadu was due out \"any time now.\" Ted Nelson's hypertext system, with links that never break and royalties by the byte, was promised in 18 months in 1988, released as code in 1999 and made clickable in 2014. Following Nelson from his idea in 1960 to 2026, this piece asks why it never got built."
 pubDate: 2026-09-15T07:26:17Z
 updatedDate: 2026-09-15
-heroImage: "/media/xanadu-cover-1200x630-cda6ac83.png"
+heroImage: "https://toddzheng.net/media/xanadu-cover-1200x630-cda6ac83.png"
 tags: ["Internet History", "Dotcom", "History of Technology", "Hypertext", "Xanadu"]
 series: dotcom-chronicles
 seriesOrder: 6
