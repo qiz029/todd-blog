@@ -3,7 +3,7 @@ title: "Dotcom编年史 番外二：代码“随时”发布"
 description: "1992 年 CERN 网站说，Xanadu 的代码“随时”发布。这套要让链接永远不断、引用按字节付费的超文本系统，1988 年说 18 个月，1999 年才放出代码，2014 年才有能点开的版本。跟着 Ted Nelson 从 1960 年的念头一路走到 2026 年，看它为什么一直没做出来。"
 pubDate: 2026-09-15T07:26:17Z
 updatedDate: 2026-09-15
-heroImage: "/media/xanadu-cover-1200x630-cda6ac83.png"
+heroImage: "https://toddzheng.net/media/xanadu-cover-1200x630-cda6ac83.png"
 tags: ["互联网历史", "Dotcom", "科技史", "超文本", "Xanadu"]
 series: dotcom-chronicles
 seriesOrder: 6
