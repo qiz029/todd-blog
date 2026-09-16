@@ -4,6 +4,7 @@ import { SITE_TITLE } from '../consts';
 import { t } from '../i18n/translations';
 import HeaderLink from './HeaderLink.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
+import CommandPalette from './CommandPalette.astro';
 
 const locale = Astro.currentLocale || 'en';
 ---
@@ -24,9 +25,13 @@ const locale = Astro.currentLocale || 'en';
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="19" r="1" fill="currentColor" /><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" /></svg>
         {t('rss.link', locale)}
       </a>
+      <button class="palette-trigger" type="button" aria-label={t('palette.trigger', locale)}>
+        <span class="pt-key">⌘</span><span class="pt-key">K</span>
+      </button>
       <LanguageSwitcher />
     </div>
   </nav>
+  <CommandPalette />
 </header>
 <style>
   header {
@@ -67,6 +72,26 @@ const locale = Astro.currentLocale || 'en';
     flex-wrap: wrap;
   }
   .internal-links { display: flex; align-items: center; flex-wrap: wrap; }
+  .palette-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    margin: 0 0.5em;
+    padding: 0.35em 0.6em;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 0.72em;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .palette-trigger:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(230, 43, 30, 0.18);
+  }
   nav .rss-link {
     display: inline-flex;
     align-items: center;

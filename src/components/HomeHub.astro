@@ -24,11 +24,12 @@ const proof = [
 ---
 
 <section class="hero">
+  <canvas class="hero-particles" aria-hidden="true"></canvas>
   <div class="hero-geo" aria-hidden="true">
-    <span class="g1"></span><span class="g2"></span><span class="g3"></span>
+    <span class="g1" data-depth="0.9"></span><span class="g2" data-depth="0.5"></span><span class="g3" data-depth="0.25"></span>
   </div>
   <div class="hero-term" aria-hidden="true">
-    <span class="prompt">~ $</span><span id="term-cmd">whoami</span><span class="cursor">▌</span>
+    <span class="prompt">~ $</span><span id="term-cmd"></span><span class="cursor">▌</span>
   </div>
   <p class="role">{t('home.role', locale)}</p>
   <h1>{t('home.heading', locale)}</h1>
@@ -40,13 +41,13 @@ const proof = [
   </div>
 </section>
 
-<section class="proof" aria-label={t('home.proof.label', locale)}>
+<section class="proof reveal" aria-label={t('home.proof.label', locale)}>
   {proof.map(([value, labelKey]) => (
     <div class="proof-item"><strong>{value}</strong><span>{t(labelKey, locale)}</span></div>
   ))}
 </section>
 
-<section class="hub-section animate-in">
+<section class="hub-section reveal">
   <div class="section-heading">
     <div>
       <p class="section-kicker">{t('home.building.kicker', locale)}</p>
@@ -68,7 +69,7 @@ const proof = [
   </div>
 </section>
 
-<section class="hub-section writing animate-in">
+<section class="hub-section writing reveal">
   <div class="section-heading">
     <div>
       <p class="section-kicker">{t('home.writing.kicker', locale)}</p>
@@ -98,9 +99,16 @@ const proof = [
 </section>
 
 <style>
-  .hero { margin-bottom: 2.5em; }
+  .hero { margin-bottom: 2.5em; position: relative; }
+  .hero-particles { position: absolute; inset: -3em -5em; width: calc(100% + 10em); height: calc(100% + 6em); pointer-events: none; }
+  .hero > :not(canvas) { position: relative; }
   .hero-geo { display: flex; gap: 6px; margin-bottom: 2em; animation: rise 0.4s ease-out both; }
-  .hero-geo span { display: block; height: 3px; }
+  .hero-geo span { display: block; height: 3px; will-change: transform; }
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
   .hero-geo .g1 { width: 48px; background: var(--accent); }
   .hero-geo .g2 { width: 24px; background: var(--accent-amber); }
   .hero-geo .g3 { width: 12px; background: var(--text-muted); }
@@ -121,14 +129,14 @@ const proof = [
   .proof-item:last-child { border-right: 0; }
   .proof-item strong { display: block; color: var(--text); font-family: var(--font-space-grotesk); font-size: 1.35em; line-height: 1.2; }
   .proof-item span { display: block; margin-top: 0.35em; color: var(--text-muted); font-size: 0.72em; line-height: 1.4; }
-  .hub-section { margin-bottom: 4.5em; animation-delay: 0.08s; }
+  .hub-section { margin-bottom: 4.5em; }
   .section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 1em; margin-bottom: 0.5em; }
   .section-heading h2 { margin: 0; font-size: 1.7em; }
   .section-heading > a { flex: none; color: #ff6256; font-size: 0.86em; }
   .section-kicker { margin: 0 0 0.2em; color: var(--text-muted); font-family: var(--font-jetbrains), monospace; font-size: 0.72em; letter-spacing: 0.08em; text-transform: uppercase; }
   .section-intro { max-width: 650px; margin: 0 0 1.5em; color: var(--text-muted); font-size: 0.94em; }
   .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1em; }
-  .product-card { display: block; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
+  .product-card { display: block; overflow: hidden; position: relative; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text); transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease; }
   .product-card:hover { border-color: var(--accent); background: var(--bg-card-hover); color: var(--text); transform: translateY(-2px); }
   .product-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; border-radius: 0; border-bottom: 1px solid var(--border); }
   .product-body { padding: 0.9em 1em 1em; }
@@ -136,7 +144,17 @@ const proof = [
   .product-name span { color: var(--accent); }
   .product-body p { margin: 0.45em 0 0; color: var(--text-muted); font-size: 0.78em; line-height: 1.55; }
   .post-list { list-style: none; margin: 1.5em 0 0; padding: 0; }
-  .post-card a { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5em; padding: 1.15em 0; border-top: 1px solid var(--border); color: var(--text); }
+  .post-card a { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5em; padding: 1.15em 0; border-top: 1px solid var(--border); color: var(--text); position: relative; }
+  .product-card::after, .post-card a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(230, 43, 30, 0.14), transparent 65%);
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .product-card:hover::after, .post-card a:hover::after { opacity: 1; }
   .post-card:last-child a { border-bottom: 1px solid var(--border); }
   .post-card a:hover .post-title { color: var(--accent); }
   .post-title { font-size: 1.08em; font-weight: 600; transition: color 0.2s ease; }
@@ -162,16 +180,214 @@ const proof = [
   document.addEventListener('astro:page-load', () => {
     const command = document.getElementById('term-cmd');
     if (!command) return;
-    const text = 'whoami';
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      command.textContent = text;
-      return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const phrases = ['whoami', 'todd zheng', 'Staff Software Engineer @ TikTok'];
+    if (reduceMotion) {
+      command.textContent = phrases[0];
+    } else {
+      const TYPE_MS = 90;
+      const DELETE_MS = 45;
+      const HOLD_MS = 1600;
+      const GAP_MS = 350;
+      let phrase = 0;
+      let index = 0;
+      let deleting = false;
+      const tick = () => {
+        const text = phrases[phrase];
+        if (!deleting) {
+          command.textContent = text.slice(0, ++index);
+          if (index >= text.length) {
+            deleting = true;
+            window.setTimeout(tick, HOLD_MS);
+            return;
+          }
+          window.setTimeout(tick, TYPE_MS);
+        } else {
+          command.textContent = text.slice(0, --index);
+          if (index <= 0) {
+            deleting = false;
+            phrase = (phrase + 1) % phrases.length;
+            window.setTimeout(tick, GAP_MS);
+            return;
+          }
+          window.setTimeout(tick, DELETE_MS);
+        }
+      };
+      tick();
     }
-    command.textContent = '';
-    let index = 0;
-    const timer = window.setInterval(() => {
-      command.textContent = text.slice(0, ++index);
-      if (index >= text.length) window.clearInterval(timer);
-    }, 90);
+
+    const hero = document.querySelector('.hero');
+    const heroTerm = document.querySelector('.hero-term');
+    const geoBars = document.querySelectorAll('.hero-geo span');
+    if (!hero || !heroTerm || !geoBars.length) return;
+
+    const reveals = document.querySelectorAll('.reveal');
+    if (reveals.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+      reveals.forEach((el) => observer.observe(el));
+      document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
+    }
+
+    document.querySelectorAll('.product-card, .post-card a').forEach((card) => {
+      card.addEventListener('pointermove', (event) => {
+        const el = card as HTMLElement;
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+        el.style.setProperty('--my', `${event.clientY - rect.top}px`);
+      });
+    });
+
+    if (reduceMotion) return;
+
+    let mouseX = 0;
+    let mouseY = 0;
+    let ticking = false;
+    const applyParallax = () => {
+      ticking = false;
+      const y = window.scrollY;
+      if (y <= window.innerHeight) {
+        heroTerm.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
+        heroTerm.style.opacity = String(Math.max(0, 1 - y / 320));
+      }
+      geoBars.forEach((bar) => {
+        const depth = Number((bar as HTMLElement).dataset.depth || 0.5);
+        const scrollY = y <= window.innerHeight ? y * depth * -0.6 : 0;
+        (bar as HTMLElement).style.transform =
+          `translate3d(${mouseX * depth * 18}px, ${mouseY * depth * 10 + scrollY}px, 0)`;
+      });
+    };
+    const requestParallax = () => {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(applyParallax);
+      }
+    };
+    window.addEventListener('scroll', requestParallax, { passive: true });
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', requestParallax);
+    }, { once: true });
+
+    const canvas = hero.querySelector('.hero-particles') as HTMLCanvasElement | null;
+    const ctx = canvas?.getContext('2d');
+    let particleMouse = { x: -9999, y: -9999 };
+    if (canvas && ctx) {
+      interface Particle { x: number; y: number; vx: number; vy: number; amber: boolean; }
+      let particles: Particle[] = [];
+      let w = 0;
+      let h = 0;
+      let raf = 0;
+      let running = false;
+      const LINK_DIST = 110;
+      const MOUSE_DIST = 130;
+      const resize = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = canvas.getBoundingClientRect();
+        w = rect.width;
+        h = rect.height;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = Math.min(80, Math.floor((w * h) / 15000));
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          amber: Math.random() < 0.22,
+        }));
+      };
+      const step = () => {
+        if (!running) return;
+        ctx.clearRect(0, 0, w, h);
+        for (const p of particles) {
+          const dx = p.x - particleMouse.x;
+          const dy = p.y - particleMouse.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > 0.01 && d2 < MOUSE_DIST * MOUSE_DIST) {
+            const d = Math.sqrt(d2);
+            const force = ((MOUSE_DIST - d) / MOUSE_DIST) * 0.06;
+            p.vx += (dx / d) * force;
+            p.vy += (dy / d) * force;
+          }
+          p.vx = Math.max(-0.7, Math.min(0.7, p.vx));
+          p.vy = Math.max(-0.7, Math.min(0.7, p.vy));
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x += w;
+          if (p.x > w) p.x -= w;
+          if (p.y < 0) p.y += h;
+          if (p.y > h) p.y -= h;
+        }
+        ctx.lineWidth = 1;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const a = particles[i];
+            const b = particles[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < LINK_DIST * LINK_DIST) {
+              const alpha = (1 - Math.sqrt(d2) / LINK_DIST) * 0.16;
+              ctx.strokeStyle = `rgba(230, 43, 30, ${alpha})`;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+        for (const p of particles) {
+          ctx.fillStyle = p.amber ? 'rgba(240, 192, 64, 0.55)' : 'rgba(230, 43, 30, 0.45)';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        raf = window.requestAnimationFrame(step);
+      };
+      const setRunning = (on: boolean) => {
+        if (on === running) return;
+        running = on;
+        if (on) raf = window.requestAnimationFrame(step);
+        else window.cancelAnimationFrame(raf);
+      };
+      resize();
+      const canvasObserver = new IntersectionObserver((entries) => {
+        setRunning(entries[0]?.isIntersecting === true && !document.hidden);
+      });
+      canvasObserver.observe(canvas);
+      const onVisibility = () => setRunning(!document.hidden);
+      const onResize = () => resize();
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('resize', onResize);
+      document.addEventListener('astro:before-swap', () => {
+        setRunning(false);
+        canvasObserver.disconnect();
+        document.removeEventListener('visibilitychange', onVisibility);
+        window.removeEventListener('resize', onResize);
+      }, { once: true });
+    }
+
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      hero.addEventListener('mousemove', (event) => {
+        const rect = hero.getBoundingClientRect();
+        mouseX = (event.clientX - rect.left) / rect.width - 0.5;
+        mouseY = (event.clientY - rect.top) / rect.height - 0.5;
+        requestParallax();
+        if (canvas) {
+          const crect = canvas.getBoundingClientRect();
+          particleMouse = { x: event.clientX - crect.left, y: event.clientY - crect.top };
+        }
+      });
+      hero.addEventListener('mouseleave', () => {
+        particleMouse = { x: -9999, y: -9999 };
+      });
+    }
   });
 </script>

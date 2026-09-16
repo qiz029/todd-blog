@@ -11,6 +11,17 @@ const dict: Record<string, Record<string, string>> = {
   'rss.heading': { en: 'Keep up with new writing', zh: '订阅新文章' },
   'rss.description': { en: 'Get new article summaries in your RSS reader. Add the feed address below to subscribe.', zh: '在 RSS 阅读器里接收新文章摘要。将下方地址添加到阅读器，即可订阅。' },
 
+  // Command palette
+  'palette.trigger':      { en: 'Search', zh: '搜索' },
+  'palette.placeholder':  { en: 'Type to search pages and posts…', zh: '输入以搜索页面和文章…' },
+  'palette.empty':        { en: 'No matching commands', zh: '没有匹配的命令' },
+  'palette.group.pages':  { en: 'Pages', zh: '页面' },
+  'palette.group.posts':  { en: 'Writing', zh: '文章' },
+  'palette.lang':         { en: '切换到中文', zh: 'Switch to English' },
+  'palette.hint.nav':     { en: 'navigate', zh: '选择' },
+  'palette.hint.open':    { en: 'open', zh: '打开' },
+  'palette.hint.close':   { en: 'close', zh: '关闭' },
+
   // Home page
   'home.heading':   { en: 'Todd Zheng', zh: 'Todd Zheng' },
   'home.metaTitle': { en: 'Todd Zheng — Engineer, Builder, Writer', zh: 'Todd Zheng — 工程师、产品构建者、写作者' },
