@@ -12,6 +12,7 @@ import {
 } from './http';
 import { GitHubError, getFile, getRepoFile, listMarkdownDir, listPosts, putFile, putRepoFile } from './github';
 import {
+	bilibiliId,
 	isSeriesStatus,
 	isValidDate,
 	isValidSlug,
@@ -115,6 +116,7 @@ function postResource(
 		heroImage: fields.heroImage ?? null,
 		series: fields.series ?? null,
 		seriesOrder: fields.seriesOrder ?? null,
+		bilibili: fields.bilibili ?? null,
 		htmlUrl: htmlPath(locale, slug),
 		...extra,
 		_links: postLinks(ctx.request, locale, slug),
@@ -213,6 +215,7 @@ interface WriteBody {
 	heroImageUrl?: unknown;
 	series?: unknown;
 	seriesOrder?: unknown;
+	bilibili?: unknown;
 }
 
 async function readJson(request: Request): Promise<WriteBody | Response> {
@@ -276,6 +279,16 @@ function parseSeriesOrder(request: Request, value: unknown): number | undefined 
 	return value;
 }
 
+/** BV id or a Bilibili video URL; null/empty clears it. */
+function parseBilibili(request: Request, value: unknown): string | undefined | Response {
+	if (value === undefined || value === null || value === '') return undefined;
+	const id = typeof value === 'string' ? bilibiliId(value) : undefined;
+	if (!id) {
+		return errorJson(request, 400, 'invalid', 'bilibili must be a BV id (e.g. BV1xx411c7mD) or a bilibili.com/video/BV... URL');
+	}
+	return id;
+}
+
 /** 400 unless src/content/series/<locale>/<slug>.md exists (draft or published). */
 async function requireSeriesExists(ctx: Ctx, locale: Locale, slug: string): Promise<Response | null> {
 	const file = await getRepoFile(ctx.env, seriesPath(locale, slug));
@@ -336,6 +349,8 @@ async function handleCreatePost(ctx: Ctx): Promise<Response> {
 	if (seriesOrder !== undefined && !series) {
 		return errorJson(ctx.request, 400, 'invalid', 'seriesOrder requires series');
 	}
+	const bilibili = parseBilibili(ctx.request, body.bilibili);
+	if (bilibili instanceof Response) return bilibili;
 
 	const fields: PostFields = {
 		title: body.title.trim(),
@@ -347,6 +362,7 @@ async function handleCreatePost(ctx: Ctx): Promise<Response> {
 		draft,
 		series,
 		seriesOrder,
+		bilibili,
 		body: body.body,
 	};
 
@@ -376,7 +392,7 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 	const body = await readJson(ctx.request);
 	if (body instanceof Response) return body;
 
-	const keys = ['title', 'description', 'body', 'tags', 'pubDate', 'updatedDate', 'draft', 'heroImageUrl', 'series', 'seriesOrder'] as const;
+	const keys = ['title', 'description', 'body', 'tags', 'pubDate', 'updatedDate', 'draft', 'heroImageUrl', 'series', 'seriesOrder', 'bilibili'] as const;
 	if (!keys.some((k) => k in body)) {
 		return errorJson(ctx.request, 400, 'invalid', 'PATCH body must include at least one updatable field');
 	}
@@ -449,6 +465,11 @@ async function handleUpdatePost(ctx: Ctx): Promise<Response> {
 				return errorJson(ctx.request, 400, 'invalid', 'seriesOrder requires series');
 			}
 			fields.seriesOrder = seriesOrder;
+		}
+		if (body.bilibili !== undefined) {
+			const bilibili = parseBilibili(ctx.request, body.bilibili);
+			if (bilibili instanceof Response) return bilibili;
+			fields.bilibili = bilibili;
 		}
 
 		fields.updatedDate = fields.updatedDate ?? todayUTC();

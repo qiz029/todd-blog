@@ -1,0 +1,162 @@
+---
+// "Video version" block for posts with a `bilibili` BV id. Renders a lightweight poster
+// that swaps in Bilibili's player on click, so the heavy iframe only loads for readers
+// who want it. Without JS the poster is a plain (tracked) link to the video.
+import { BILIBILI_GO } from '../consts';
+import { t } from '../i18n/translations';
+import BilibiliLink from './BilibiliLink.astro';
+
+interface Props {
+	bv: string;
+	title: string;
+	/** The post's hero image; without one the poster is a plain panel. */
+	poster?: string;
+	locale: string;
+}
+
+const { bv, title, poster, locale } = Astro.props;
+const player = `https://player.bilibili.com/player.html?bvid=${bv}&autoplay=1&high_quality=1&danmaku=0`;
+---
+
+<section class="bili" aria-label={t('video.label', locale)}>
+	<div class="bili-head">
+		<span class="bili-label">▶ {t('video.label', locale)}</span>
+		<BilibiliLink bv={bv} class="bili-watch">{t('video.watch', locale)} ↗</BilibiliLink>
+	</div>
+	<a
+		class="bili-frame"
+		href={`${BILIBILI_GO}/${bv}`}
+		data-player={player}
+		data-title={title}
+		rel="nofollow noopener"
+		data-astro-reload
+		data-astro-prefetch="false"
+		aria-label={`${t('video.play', locale)}: ${title}`}
+	>
+		{poster ? (
+			<img src={poster} alt="" loading="lazy" decoding="async" />
+		) : (
+			<span class="bili-blank" aria-hidden="true">{t('video.play', locale)}</span>
+		)}
+		<span class="bili-play" aria-hidden="true"></span>
+	</a>
+	<p class="bili-follow"><BilibiliLink>{t('video.follow', locale)} →</BilibiliLink></p>
+</section>
+
+<style>
+	.bili {
+		margin: 0 0 2.5em;
+		padding: 1em;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-left: 3px solid #fb7299;
+		border-radius: 6px;
+	}
+	.bili-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1em;
+		margin-bottom: 0.75em;
+		font-family: var(--font-jetbrains), monospace;
+		font-size: 0.8em;
+	}
+	.bili-label {
+		color: #fb7299;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.bili :global(.bili-watch),
+	.bili-follow :global(a) {
+		color: var(--text-muted);
+	}
+	.bili :global(.bili-watch:hover),
+	.bili-follow :global(a:hover) {
+		color: #fb7299;
+	}
+	.bili-frame {
+		position: relative;
+		display: block;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		border-radius: 4px;
+		background: #000;
+	}
+	.bili-frame img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 0;
+		opacity: 0.85;
+		transition: opacity 0.2s ease;
+	}
+	.bili-frame:hover img { opacity: 1; }
+	.bili-blank {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		padding-bottom: 15%;
+		background: radial-gradient(circle at 50% 45%, rgba(251, 114, 153, 0.22), transparent 60%), #0b0f15;
+		color: var(--text-muted);
+		font-family: var(--font-jetbrains), monospace;
+		font-size: 0.8em;
+		letter-spacing: 0.06em;
+	}
+	.bili-frame:hover .bili-blank { color: var(--text); }
+	.bili-play {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 68px;
+		height: 48px;
+		transform: translate(-50%, -50%);
+		border-radius: 12px;
+		background: #fb7299;
+		box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+	}
+	.bili-play::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 54%;
+		transform: translate(-50%, -50%);
+		border-style: solid;
+		border-width: 10px 0 10px 17px;
+		border-color: transparent transparent transparent #fff;
+	}
+	.bili-frame :global(iframe) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+	.bili-follow {
+		margin: 0.75em 0 0 !important;
+		font-size: 0.8em;
+		font-family: var(--font-jetbrains), monospace;
+	}
+</style>
+
+<script>
+	document.addEventListener('astro:page-load', () => {
+		document.querySelectorAll<HTMLAnchorElement>('.bili-frame[data-player]').forEach((frame) => {
+			frame.addEventListener('click', (event) => {
+				if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+				event.preventDefault();
+				const iframe = document.createElement('iframe');
+				iframe.src = frame.dataset.player!;
+				iframe.title = frame.dataset.title ?? '';
+				iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+				iframe.allowFullscreen = true;
+				iframe.referrerPolicy = 'no-referrer-when-downgrade';
+				frame.replaceChildren(iframe);
+				frame.removeAttribute('href');
+				frame.removeAttribute('data-player');
+			}, { once: true });
+		});
+	});
+</script>

@@ -6,6 +6,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import BilibiliEmbed from '../components/BilibiliEmbed.astro';
+import BilibiliLink from '../components/BilibiliLink.astro';
 import { AUTHOR_NAME } from '../consts';
 import { t } from '../i18n/translations';
 import { tagUrl } from '../lib/tags';
@@ -48,6 +50,7 @@ const {
   updatedDate,
   heroImage,
   tags = [],
+  bilibili,
   locale = 'en',
   headings = [],
   stats,
@@ -553,6 +556,14 @@ const shareLinks = [
               )}
               <hr />
             </div>
+            {bilibili && (
+              <BilibiliEmbed
+                bv={bilibili}
+                title={title}
+                poster={heroImage && (typeof heroImage === 'string' ? heroImage : heroImage.src)}
+                locale={locale}
+              />
+            )}
             <slot />
 
             <div class="post-footer">
@@ -576,6 +587,7 @@ const shareLinks = [
                   <div class="author-links">
                     <a href="https://github.com/qiz029">GitHub</a>
                     <a href="https://www.linkedin.com/in/toddzheng-024">LinkedIn</a>
+                    <BilibiliLink>{t('bilibili.name', locale)}</BilibiliLink>
                     <a href={`/${locale}/rss.xml`}>RSS</a>
                   </div>
                 </div>

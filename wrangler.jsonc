@@ -1,4 +1,4 @@
-// Static assets + a Worker that runs first for /api/* and /media/*.
+// Static assets + a Worker that runs first for /api/*, /media/* and /go/* (tracked outbound links).
 // Everything else is served from ./dist via the assets binding.
 //
 // Generate Env types after changing bindings:
@@ -12,7 +12,7 @@
 		"directory": "./dist",
 		"binding": "ASSETS",
 		"not_found_handling": "404-page",
-		"run_worker_first": ["/api", "/api/*", "/media", "/media/*"]
+		"run_worker_first": ["/api", "/api/*", "/media", "/media/*", "/go/*"]
 	},
 	"r2_buckets": [
 		{

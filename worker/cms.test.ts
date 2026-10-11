@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { handleRequest } from './index';
-import { parseMarkdown, parseSeriesMarkdown, serializeMarkdown, serializeSeriesMarkdown, slugify, isValidDate } from './markdown';
+import { bilibiliId, parseMarkdown, parseSeriesMarkdown, serializeMarkdown, serializeSeriesMarkdown, slugify, isValidDate } from './markdown';
 import { utf8ToBase64, base64ToUtf8 } from './github';
 
 const TOKEN = 'test-cms-token';
@@ -159,6 +159,18 @@ describe('markdown', () => {
 		const orphan = serializeMarkdown({ title: 't', description: 'd', pubDate: '2026-05-11', tags: [], draft: false, seriesOrder: 3, body: '' });
 		expect(orphan).not.toContain('seriesOrder');
 		expect(parseMarkdown(orphan).series).toBeUndefined();
+	});
+
+	it('normalizes Bilibili videos to BV ids and round-trips them', () => {
+		expect(bilibiliId('BV119pj6SEhy')).toBe('BV119pj6SEhy');
+		expect(bilibiliId('https://www.bilibili.com/video/BV119pj6SEhy/?spm_id_from=333.1007')).toBe('BV119pj6SEhy');
+		expect(bilibiliId('https://b23.tv/BV119pj6SEhy')).toBe('BV119pj6SEhy');
+		expect(bilibiliId('https://example.com/video/BV119pj6SEhy')).toBeUndefined();
+		expect(bilibiliId('av170001')).toBeUndefined();
+
+		const md = serializeMarkdown({ title: 't', description: 'd', pubDate: '2026-05-11', tags: [], draft: false, bilibili: 'BV119pj6SEhy', body: '' });
+		expect(md).toContain('bilibili: BV119pj6SEhy');
+		expect(parseMarkdown(md).bilibili).toBe('BV119pj6SEhy');
 	});
 
 	it('round-trips series metadata files', () => {
@@ -389,6 +401,24 @@ describe('CMS worker', () => {
 		expect(body.title).toBe('Unlisted');
 		expect(body.commitSha).toMatch(/^commit-/);
 		expect(files.get('src/content/blog/en/published.md')!.content).toContain('draft: true');
+	});
+
+	it('PATCH sets, rejects, and clears the Bilibili video', async () => {
+		const patch = (bilibili: unknown) =>
+			handleRequest(
+				req('/api/posts/en/published', auth({ method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bilibili }) })),
+				env,
+			);
+		const set = await patch('https://www.bilibili.com/video/BV119pj6SEhy/');
+		expect(set.status).toBe(200);
+		expect(((await set.json()) as { bilibili: string }).bilibili).toBe('BV119pj6SEhy');
+		expect(files.get('src/content/blog/en/published.md')!.content).toContain('bilibili: BV119pj6SEhy');
+
+		expect((await patch('not-a-video')).status).toBe(400);
+
+		const cleared = await patch(null);
+		expect(((await cleared.json()) as { bilibili: string | null }).bilibili).toBeNull();
+		expect(files.get('src/content/blog/en/published.md')!.content).not.toContain('bilibili');
 	});
 
 	it('PATCH preserves the exact publication timestamp through storage and response', async () => {

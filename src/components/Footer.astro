@@ -1,5 +1,6 @@
 ---
 import { t } from '../i18n/translations';
+import BilibiliLink from './BilibiliLink.astro';
 const today = new Date();
 const { locale = 'en' } = Astro.props;
 const feedPath = `/${locale}/rss.xml`;
@@ -17,9 +18,11 @@ const feedURL = new URL(feedPath, Astro.site).href;
   <div class="footer-content">
     <span>&copy; {today.getFullYear()} Todd Zheng</span>
     <div class="links">
+      {locale === 'zh' && <BilibiliLink>{t('bilibili.name', locale)}</BilibiliLink>}
       <a href="mailto:toddzheng024@gmail.com">Email</a>
-      <a href="https://www.linkedin.com/in/toddzheng-024/" target="_blank">LinkedIn</a>
+      <a href="https://www.linkedin.com/in/toddzheng-024/" target="_blank" rel="noopener">LinkedIn</a>
       <a href="https://x.com/ShiZheng24517" target="_blank" rel="noopener">X</a>
+      {locale !== 'zh' && <BilibiliLink>{t('bilibili.name', locale)}</BilibiliLink>}
     </div>
   </div>
 </footer>
@@ -65,7 +68,7 @@ const feedURL = new URL(feedPath, Astro.site).href;
     display: flex;
     gap: 1.5em;
   }
-  .links a {
+  .links :global(a) {
     color: var(--text-muted);
     text-decoration: none;
     background-image: linear-gradient(var(--accent), var(--accent));
@@ -75,7 +78,7 @@ const feedURL = new URL(feedPath, Astro.site).href;
     padding-bottom: 2px;
     transition: background-size 0.3s ease, color 0.2s ease;
   }
-  .links a:hover {
+  .links :global(a:hover) {
     color: var(--accent);
     background-size: 100% 1px;
   }

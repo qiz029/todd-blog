@@ -1,3 +1,4 @@
+import { handleGo } from './go';
 import { dispatchHandler } from './handlers';
 import { errorJson, isAuthorized, json, normalizePath } from './http';
 import { matchRoute } from './spec';
@@ -40,6 +41,11 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
 			const message = err instanceof Error ? err.message : 'Internal error';
 			return errorJson(request, 500, 'upstream', message);
 		}
+	}
+
+	if (pathname.startsWith('/go/')) {
+		const go = handleGo(request, pathname);
+		if (go) return go;
 	}
 
 	if (pathname === '/api' || pathname.startsWith('/api/') || pathname.startsWith('/media/')) {

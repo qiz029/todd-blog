@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { bilibiliId } from '../worker/markdown';
 
 const blog = defineCollection({
 	// Load Markdown and MDX files in the `src/content/blog/` directory.
@@ -24,6 +25,15 @@ const blog = defineCollection({
 				.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'series must be a kebab-case slug')
 				.optional(),
 			seriesOrder: z.number().int().positive().optional(),
+			// Bilibili video of this post: a BV id, or a bilibili.com/video/BV... URL normalized to one.
+			bilibili: z
+				.string()
+				.transform((value, ctx) => {
+					const id = bilibiliId(value);
+					if (!id) ctx.addIssue({ code: 'custom', message: 'bilibili must be a BV id or Bilibili video URL' });
+					return id ?? value;
+				})
+				.optional(),
 		}),
 });
 

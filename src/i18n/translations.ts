@@ -139,6 +139,15 @@ const dict: Record<string, Record<string, string>> = {
   'about.gh':  { en: 'GitHub',    zh: 'GitHub' },
   'about.li':  { en: 'LinkedIn',  zh: 'LinkedIn' },
   'about.x':   { en: 'X',         zh: 'X' },
+  'about.bilibili': { en: 'Bilibili (videos, in Chinese)', zh: 'B 站 — 视频版内容' },
+
+  // Bilibili
+  'bilibili.name':    { en: 'Bilibili', zh: 'B 站' },
+  'bilibili.palette': { en: 'My Bilibili channel', zh: '我的 B 站' },
+  'video.label':      { en: 'Video version', zh: '视频版' },
+  'video.watch':      { en: 'Watch on Bilibili', zh: '去 B 站看' },
+  'video.play':       { en: 'Play video', zh: '播放视频' },
+  'video.follow':     { en: 'More videos on Bilibili', zh: '更多视频在我的 B 站' },
   'about.rss': { en: 'RSS',       zh: 'RSS' },
 
   // Footer

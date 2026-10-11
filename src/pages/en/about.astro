@@ -1,6 +1,7 @@
 ---
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
+import BilibiliLink from '../../components/BilibiliLink.astro';
 import Header from '../../components/Header.astro';
 import { SITE_TITLE } from '../../consts';
 import { t } from '../../i18n/translations';
@@ -54,6 +55,7 @@ const locale = 'en';
         <li><a href="https://github.com/qiz029">{t('about.gh', locale)}</a></li>
         <li><a href="https://www.linkedin.com/in/toddzheng-024">{t('about.li', locale)}</a></li>
         <li><a href="https://x.com/ShiZheng24517">{t('about.x', locale)} — @ShiZheng24517</a></li>
+        <li><BilibiliLink>{t('about.bilibili', locale)}</BilibiliLink></li>
         <li><a href="https://toddzheng.net/en/rss.xml">RSS</a></li>
       </ul>
     </main>

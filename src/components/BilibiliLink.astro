@@ -1,0 +1,21 @@
+---
+// Tracked link to Bilibili via the worker's /go/bilibili redirect (worker/go.ts).
+// Full-page navigation and no prefetch, so the client router never fetches the
+// redirect itself and hover prefetches are not counted as clicks.
+import { BILIBILI_GO } from '../consts';
+
+interface Props {
+	bv?: string;
+	class?: string;
+}
+
+const { bv, class: className } = Astro.props;
+---
+
+<a
+	href={bv ? `${BILIBILI_GO}/${bv}` : BILIBILI_GO}
+	class={className}
+	rel="nofollow noopener"
+	data-astro-reload
+	data-astro-prefetch="false"
+><slot /></a>

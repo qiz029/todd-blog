@@ -282,6 +282,7 @@ const schemas = {
 				description: 'Slug of an existing series in the same locale (see GET /api/series). Validated on write; create the series first with POST /api/series.',
 			},
 			seriesOrder: { type: 'integer', minimum: 1, description: '1-based reading position within the series' },
+			bilibili: { type: 'string', description: 'Bilibili video (BV id or bilibili.com/video/BV... URL), embedded as the post\'s video version' },
 		},
 	},
 	UpdatePost: {
@@ -297,6 +298,7 @@ const schemas = {
 			heroImageUrl: { type: ['string', 'null'] },
 			series: { type: ['string', 'null'], description: 'null removes the post from its series' },
 			seriesOrder: { type: ['integer', 'null'], minimum: 1 },
+			bilibili: { type: ['string', 'null'], description: 'BV id or Bilibili video URL; null removes the video' },
 		},
 	},
 	Post: {
@@ -314,6 +316,7 @@ const schemas = {
 			heroImage: { type: 'string' },
 			series: { type: ['string', 'null'] },
 			seriesOrder: { type: ['integer', 'null'] },
+			bilibili: { type: ['string', 'null'], description: 'BV id' },
 			sha: { type: 'string' },
 			commitSha: { type: 'string' },
 			htmlUrl: { type: 'string' },

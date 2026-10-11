@@ -25,7 +25,19 @@ export interface PostFields {
 	/** Series slug (kebab-case) and 1-based reading position. */
 	series?: string;
 	seriesOrder?: number;
+	/** Bilibili video id (BV...) shown as the post's video version. */
+	bilibili?: string;
 	body: string;
+}
+
+const BILIBILI_RE = /^BV[0-9A-Za-z]{10}$/;
+
+/** Accepts a bare BV id or any bilibili.com / b23.tv URL containing one; returns the BV id. */
+export function bilibiliId(value: string): string | undefined {
+	const trimmed = value.trim();
+	if (BILIBILI_RE.test(trimmed)) return trimmed;
+	const match = trimmed.match(/^https?:\/\/(?:[\w-]+\.)?(?:bilibili\.com|b23\.tv)\/(?:video\/)?(BV[0-9A-Za-z]{10})(?:[/?#]|$)/);
+	return match?.[1];
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -105,6 +117,7 @@ export function parseMarkdown(raw: string): PostFields {
 		draft: data.draft === true || data.draft === 'true',
 		series: data.series ? String(data.series) : undefined,
 		seriesOrder: parseSeriesOrder(data.seriesOrder),
+		bilibili: typeof data.bilibili === 'string' ? bilibiliId(data.bilibili) : undefined,
 		body,
 	};
 }
@@ -190,6 +203,7 @@ export function serializeMarkdown(fields: PostFields): string {
 	if (fields.draft) lines.push('draft: true');
 	if (fields.series) lines.push('series: ' + fields.series);
 	if (fields.series && fields.seriesOrder) lines.push('seriesOrder: ' + fields.seriesOrder);
+	if (fields.bilibili) lines.push('bilibili: ' + fields.bilibili);
 	lines.push('---');
 	lines.push('');
 	const body = fields.body.replace(/^\n+/, '').replace(/\s+$/, '');
