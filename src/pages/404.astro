@@ -1,0 +1,56 @@
+---
+// Served by Cloudflare for any missing path (assets.not_found_handling = "404-page"
+// in wrangler.jsonc). One static page covers both locales, so it shows both.
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+import { t } from '../i18n/translations';
+
+const locales = ['en', 'zh'] as const;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title={`404 — ${SITE_TITLE}`}
+      description={t('notFound.body', 'en')}
+      alternates={false}
+      noindex
+    />
+    <style>
+      .code {
+        margin: 0 0 0.2em;
+        color: var(--accent);
+        font-family: var(--font-jetbrains), monospace;
+        font-size: 0.85em;
+      }
+      .locale + .locale {
+        margin-top: 2.5em;
+        padding-top: 2.5em;
+        border-top: 1px solid var(--border);
+      }
+      .locale h1 { font-size: 2.2em; }
+      .locale p { color: var(--text-muted); }
+      .actions { display: flex; flex-wrap: wrap; gap: 1.2em; font-size: 0.92em; }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main class="animate-in">
+      <p class="code" aria-hidden="true">~ $ HTTP 404</p>
+      {locales.map((locale) => (
+        <section class="locale" lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+          <h1>{t('notFound.title', locale)}</h1>
+          <p>{t('notFound.body', locale)}</p>
+          <div class="actions">
+            <a href={`/${locale}/`}>← {t('notFound.home', locale)}</a>
+            <a href={`/${locale}/blog/`}>{t('notFound.blog', locale)} →</a>
+          </div>
+        </section>
+      ))}
+    </main>
+    <Footer locale="en" />
+  </body>
+</html>

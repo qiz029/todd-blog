@@ -5,17 +5,17 @@ import Footer from '../../../components/Footer.astro';
 import Header from '../../../components/Header.astro';
 import { SITE_TITLE } from '../../../consts';
 import { t } from '../../../i18n/translations';
-import { localePosts, tagCounts } from '../../../lib/blog';
+import { localePosts, tagGroups } from '../../../lib/blog';
 
 const locale = Astro.currentLocale || 'en';
 const posts = localePosts(await getCollection('blog'), locale);
-const tags = tagCounts(posts);
+const tags = tagGroups(posts);
 ---
 
 <!doctype html>
 <html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
   <head>
-    <BaseHead title={`${t('tags.heading', locale)} — ${SITE_TITLE}`} />
+    <BaseHead title={`${t('tags.heading', locale)} — ${SITE_TITLE}`} description={t('tags.meta', locale)} />
     <style>
       .tag-cloud {
         display: flex;
@@ -53,10 +53,10 @@ const tags = tagCounts(posts);
     <main>
       <h1 class="animate-in">{t('tags.heading', locale)}</h1>
       <div class="tag-cloud stagger">
-        {tags.map(([tag, count]) => (
-          <a href={`/${locale}/tags/${tag}/`}>
-            <span><span class="hash">#</span>{tag}</span>
-            <span class="count">{count}</span>
+        {tags.map((tag) => (
+          <a href={`/${locale}/tags/${tag.slug}/`}>
+            <span><span class="hash">#</span>{tag.name}</span>
+            <span class="count">{tag.posts.length}</span>
           </a>
         ))}
       </div>

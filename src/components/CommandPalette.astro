@@ -6,9 +6,8 @@ const locale = Astro.currentLocale || 'en';
 const otherLocale = locale === 'zh' ? 'en' : 'zh';
 
 const posts = await getCollection('blog', (entry) => entry.id.startsWith(`${locale}/`) && !entry.data.draft);
-const recentPosts = posts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 12);
+// Every post is searchable; the list is titles only, so it stays small.
+const recentPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const pages = [
   { group: t('palette.group.pages', locale), title: t('nav.home', locale), url: `/${locale}/` },
@@ -40,6 +39,10 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
       <input
         id="palette-input"
         type="text"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="palette-list"
+        aria-autocomplete="list"
         placeholder={t('palette.placeholder', locale)}
         autocomplete="off"
         spellcheck="false"
@@ -47,7 +50,7 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
       />
       <kbd>esc</kbd>
     </div>
-    <ul class="palette-list" id="palette-list" role="listbox" data-empty={t('palette.empty', locale)}></ul>
+    <ul class="palette-list" id="palette-list" role="listbox" aria-label={t('palette.trigger', locale)} data-empty={t('palette.empty', locale)}></ul>
     <div class="palette-foot">
       <span><kbd>↑</kbd><kbd>↓</kbd> {t('palette.hint.nav', locale)}</span>
       <span><kbd>↵</kbd> {t('palette.hint.open', locale)}</span>
@@ -172,12 +175,26 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
 </style>
 
 <script>
+  import { navigate } from 'astro:transitions/client';
+
   interface PaletteItem { group: string; title: string; url: string; }
 
+  let paletteItems: PaletteItem[] = [];
+  let matched: PaletteItem[] = [];
+  let paletteActive = 0;
+  // Element that had focus before the palette opened; focus returns there on close.
+  let returnFocus: HTMLElement | null = null;
+
+  const els = () => ({
+    palette: document.getElementById('palette'),
+    input: document.getElementById('palette-input') as HTMLInputElement | null,
+    list: document.getElementById('palette-list'),
+  });
+
   const openPalette = () => {
-    const palette = document.getElementById('palette');
-    const input = document.getElementById('palette-input') as HTMLInputElement | null;
+    const { palette, input } = els();
     if (!palette || !input) return;
+    returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     palette.hidden = false;
     document.body.style.overflow = 'hidden';
     input.value = '';
@@ -186,27 +203,42 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
   };
 
   const closePalette = () => {
-    const palette = document.getElementById('palette');
+    const { palette } = els();
     if (!palette || palette.hidden) return;
     palette.hidden = true;
     document.body.style.overflow = '';
+    returnFocus?.focus();
+    returnFocus = null;
   };
 
-  let paletteItems: PaletteItem[] = [];
-  let paletteActive = 0;
+  const openItem = (item: PaletteItem) => {
+    closePalette();
+    navigate(item.url);
+  };
+
+  const setPaletteActive = (index: number) => {
+    const { input, list } = els();
+    if (!list) return;
+    paletteActive = index;
+    list.querySelectorAll('.palette-item').forEach((el, i) => {
+      el.classList.toggle('active', i === paletteActive);
+      el.setAttribute('aria-selected', String(i === paletteActive));
+    });
+    input?.setAttribute('aria-activedescendant', `palette-opt-${paletteActive}`);
+  };
 
   const renderPalette = (query: string) => {
-    const list = document.getElementById('palette-list');
+    const { input, list } = els();
     if (!list) return;
     const q = query.trim().toLowerCase();
-    const matched = q
-      ? paletteItems.filter((item) => item.title.toLowerCase().includes(q))
-      : paletteItems;
+    matched = q ? paletteItems.filter((item) => item.title.toLowerCase().includes(q)) : paletteItems;
     paletteActive = 0;
     list.innerHTML = '';
     if (!matched.length) {
+      input?.removeAttribute('aria-activedescendant');
       const empty = document.createElement('li');
       empty.className = 'palette-empty';
+      empty.setAttribute('role', 'presentation');
       empty.textContent = list.dataset.empty || '∅';
       list.appendChild(empty);
       return;
@@ -217,33 +249,27 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
         lastGroup = item.group;
         const group = document.createElement('li');
         group.className = 'palette-group';
+        group.setAttribute('role', 'presentation');
         group.textContent = item.group;
         list.appendChild(group);
       }
       const li = document.createElement('li');
-      li.className = 'palette-item' + (i === paletteActive ? ' active' : '');
+      li.id = `palette-opt-${i}`;
+      li.className = 'palette-item';
       li.textContent = item.title;
       li.setAttribute('role', 'option');
-      li.addEventListener('mousemove', () => setPaletteActive(i));
-      li.addEventListener('click', () => { window.location.href = item.url; });
+      li.addEventListener('mousemove', () => {
+        if (paletteActive !== i) setPaletteActive(i);
+      });
+      li.addEventListener('click', () => openItem(item));
       list.appendChild(li);
     });
-    (list as any)._matched = matched;
-  };
-
-  const setPaletteActive = (index: number) => {
-    const list = document.getElementById('palette-list');
-    if (!list) return;
-    paletteActive = index;
-    list.querySelectorAll('.palette-item').forEach((el, i) => {
-      el.classList.toggle('active', i === paletteActive);
-    });
+    setPaletteActive(0);
   };
 
   const movePaletteActive = (delta: number) => {
-    const list = document.getElementById('palette-list');
-    const matched: PaletteItem[] = ((list as any)?._matched) || [];
-    if (!matched.length) return;
+    const { list } = els();
+    if (!list || !matched.length) return;
     const next = (paletteActive + delta + matched.length) % matched.length;
     setPaletteActive(next);
     list.querySelectorAll('.palette-item')[next]?.scrollIntoView({ block: 'nearest' });
@@ -251,10 +277,8 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
 
   document.addEventListener('astro:page-load', () => {
     const dataEl = document.getElementById('palette-data');
-    const palette = document.getElementById('palette');
-    const input = document.getElementById('palette-input') as HTMLInputElement | null;
-    const list = document.getElementById('palette-list');
-    if (!dataEl || !palette || !input || !list) return;
+    const { palette, input } = els();
+    if (!dataEl || !palette || !input) return;
     try {
       paletteItems = JSON.parse(dataEl.textContent || '[]');
     } catch {
@@ -266,9 +290,11 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
       if (event.key === 'ArrowDown') { event.preventDefault(); movePaletteActive(1); }
       else if (event.key === 'ArrowUp') { event.preventDefault(); movePaletteActive(-1); }
       else if (event.key === 'Enter') {
-        const matched: PaletteItem[] = ((list as any)._matched) || [];
         const item = matched[paletteActive];
-        if (item) window.location.href = item.url;
+        if (item) { event.preventDefault(); openItem(item); }
+      } else if (event.key === 'Tab') {
+        // The input is the only focusable control inside the dialog; keep focus there.
+        event.preventDefault();
       }
     });
     palette.querySelector('[data-palette-close]')?.addEventListener('click', closePalette);
@@ -282,7 +308,7 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
     document.addEventListener('keydown', (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        const palette = document.getElementById('palette');
+        const { palette } = els();
         if (palette && !palette.hidden) closePalette();
         else openPalette();
       } else if (event.key === 'Escape') {

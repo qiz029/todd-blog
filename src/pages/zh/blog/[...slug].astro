@@ -49,6 +49,7 @@ const seriesInfo = series && {
   newer={newer && toLink(newer)}
   related={related.map(toLink)}
   seriesInfo={seriesInfo}
+  hasMath={post.rendered?.html.includes('class="katex') ?? false}
 >
   <Content />
 </BlogPost>

@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import rss from '@astrojs/rss';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { feedContent } from '../../lib/feed';
 
 export async function GET(context) {
 	const locale = 'en';
@@ -17,6 +18,8 @@ export async function GET(context) {
 			description: post.data.description,
 			pubDate: post.data.pubDate,
 			categories: post.data.tags,
+			// Full text, so subscribers can read without leaving their reader.
+			content: post.rendered?.html ? feedContent(post.rendered.html, context.site) : undefined,
 			link: `/${locale}/blog/${post.id.replace(locale + '/', '')}/`,
 		})),
 	});

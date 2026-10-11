@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, inferRemoteSize } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import type { MarkdownHeading } from 'astro';
 import BaseHead from '../components/BaseHead.astro';
@@ -8,7 +8,9 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { AUTHOR_NAME } from '../consts';
 import { t } from '../i18n/translations';
-import 'katex/dist/katex.min.css';
+import { tagUrl } from '../lib/tags';
+// Inlined only on posts that actually render math, instead of shipping KaTeX's CSS to every post.
+import katexCss from 'katex/dist/katex.min.css?inline';
 
 interface PostLink {
   title: string;
@@ -35,6 +37,7 @@ type Props = CollectionEntry<'blog'>['data'] & {
   newer?: PostLink;
   related?: PostLink[];
   seriesInfo?: SeriesLink;
+  hasMath?: boolean;
 };
 
 const {
@@ -52,7 +55,16 @@ const {
   newer,
   related = [],
   seriesInfo,
+  hasMath = false,
 } = Astro.props;
+
+// Remote hero images (R2) are resized at build time; keep their aspect ratio at the target width.
+const HERO_WIDTH = 1020;
+const heroSize =
+  typeof heroImage === 'string'
+    ? await inferRemoteSize(heroImage)
+    : heroImage && { width: heroImage.width, height: heroImage.height };
+const heroHeight = heroSize ? Math.round((HERO_WIDTH * heroSize.height) / heroSize.width) : undefined;
 
 // "Part {i} of {n} in {series}" split around the {series} placeholder so the title can be a link.
 const bannerParts = seriesInfo
@@ -101,8 +113,19 @@ const shareLinks = [
       title={title}
       description={description}
       image={`/og/${id}.png`}
-      article={{ pubDate, updatedDate, tags }}
+      article={{
+        pubDate,
+        updatedDate,
+        tags,
+        series: seriesInfo && { name: seriesInfo.title, url: seriesInfo.href },
+      }}
+      breadcrumbs={[
+        { name: t('nav.home', locale), url: `/${locale}/` },
+        { name: t('nav.blog', locale), url: `/${locale}/blog/` },
+        { name: title, url: Astro.url.pathname },
+      ]}
     />
+    {hasMath && <style is:inline set:html={katexCss} />}
     <style>
       main {
         width: calc(100% - 2em);
@@ -488,11 +511,14 @@ const shareLinks = [
       <article>
         {heroImage && (
           <div class="hero-image">
-            {typeof heroImage === 'string' ? (
-              <img width={1020} height={510} src={heroImage} alt={title} />
-            ) : (
-              <Image width={1020} height={510} src={heroImage} alt={title} />
-            )}
+            <Image
+              src={heroImage}
+              width={HERO_WIDTH}
+              height={heroHeight}
+              alt={title}
+              loading="eager"
+              fetchpriority="high"
+            />
           </div>
         )}
         <div class="post-grid">
@@ -513,7 +539,7 @@ const shareLinks = [
               {tags.length > 0 && (
                 <div class="tags">
                   {tags.map((tag) => (
-                    <a href={`/${locale}/tags/${tag}/`}>#{tag}</a>
+                    <a href={tagUrl(tag, locale)}>#{tag}</a>
                   ))}
                 </div>
               )}
@@ -651,6 +677,16 @@ const shareLinks = [
 
       document.addEventListener('astro:before-swap', () => highlightObserver?.disconnect());
 
+      // Clipboard writes can reject (permissions, insecure context); report it instead of failing silently.
+      async function copyText(text: string): Promise<boolean> {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
       function initPost() {
         initHighlights();
         const zh = document.documentElement.lang.startsWith('zh');
@@ -675,8 +711,9 @@ const shareLinks = [
           const idle = zh ? '复制' : 'Copy';
           btn.textContent = idle;
           btn.addEventListener('click', async () => {
-            await navigator.clipboard.writeText(code.innerText);
-            btn.textContent = zh ? '已复制' : 'Copied';
+            btn.textContent = (await copyText(code.innerText))
+              ? (zh ? '已复制' : 'Copied')
+              : (zh ? '复制失败' : 'Failed');
             setTimeout(() => (btn.textContent = idle), 1500);
           });
           tools.appendChild(btn);
@@ -689,8 +726,8 @@ const shareLinks = [
           copyBtn.dataset.ready = 'true';
           const idle = copyBtn.textContent;
           copyBtn.addEventListener('click', async () => {
-            await navigator.clipboard.writeText(location.origin + location.pathname);
-            copyBtn.textContent = copyBtn.dataset.copied ?? idle;
+            const ok = await copyText(location.origin + location.pathname);
+            copyBtn.textContent = ok ? (copyBtn.dataset.copied ?? idle) : (zh ? '复制失败' : 'Copy failed');
             setTimeout(() => (copyBtn.textContent = idle), 1500);
           });
         }

@@ -11,11 +11,11 @@ const locale = Astro.currentLocale || 'en';
 
 <header>
   <nav>
-    <h2>
+    <div class="brand-wrap">
       <a href={getRelativeLocaleUrl(locale, '/')} class="brand">
         <span class="brand-bold">Todd</span><span class="brand-light">Talk</span>
       </a>
-    </h2>
+    </div>
     <div class="internal-links">
       <HeaderLink href={getRelativeLocaleUrl(locale, '/')}>{t('nav.home', locale)}</HeaderLink>
       <HeaderLink href={getRelativeLocaleUrl(locale, '/blog')}>{t('nav.blog', locale)}</HeaderLink>
@@ -40,12 +40,14 @@ const locale = Astro.currentLocale || 'en';
     background: var(--bg);
     border-bottom: 1px solid var(--border);
   }
-  h2 {
+  .brand-wrap {
     margin: 0;
     font-size: 1em;
+    font-weight: 700;
+    line-height: 1.2;
   }
-  h2 a,
-  h2 a.active {
+  .brand-wrap a,
+  .brand-wrap a.active {
     text-decoration: none;
   }
   .brand {

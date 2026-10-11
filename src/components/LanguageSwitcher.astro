@@ -8,7 +8,15 @@ const otherLocale = currentLocale === 'en' ? 'zh' : 'en';
 // Strip the current locale prefix, prepend the other locale.
 const currentPath = Astro.url.pathname;
 const pathWithoutLocale = currentPath.replace(new RegExp(`^/${currentLocale}(/|$)`), '/$1').replace(/\/$/, '') || '/';
-const otherUrl = getRelativeLocaleUrl(otherLocale, pathWithoutLocale === '/' ? '' : pathWithoutLocale.replace(/^\//, ''));
+// Pages without a locale twin: the 404 goes to the other home page, and a single tag
+// page (tags differ per language) goes to the other locale's tag index.
+const targetPath =
+  pathWithoutLocale === '/' || pathWithoutLocale === '/404'
+    ? ''
+    : /^\/+tags\/[^/]+$/.test(pathWithoutLocale)
+      ? 'tags'
+      : pathWithoutLocale.replace(/^\//, '');
+const otherUrl = getRelativeLocaleUrl(otherLocale, targetPath);
 ---
 
 <a href={otherUrl} class="lang-switch" title={currentLocale === 'en' ? '切换到中文' : 'Switch to English'}>
@@ -19,10 +27,10 @@ const otherUrl = getRelativeLocaleUrl(otherLocale, pathWithoutLocale === '/' ? '
   .lang-switch {
     font-size: 0.85em;
     padding: 0.3em 0.6em;
-    border: 1px solid rgb(var(--gray-light));
+    border: 1px solid var(--border);
     border-radius: 4px;
     text-decoration: none;
-    color: rgb(var(--gray));
+    color: var(--text-muted);
     transition: all 0.2s ease;
   }
   .lang-switch:hover {

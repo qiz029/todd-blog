@@ -17,11 +17,17 @@ interface Props {
 		pubDate: Date;
 		updatedDate?: Date;
 		tags?: string[];
+		// The series this post belongs to, emitted as a CreativeWorkSeries.
+		series?: { name: string; url: string };
 	};
 	// Profile pages identify the author as their main entity.
 	pageType?: 'website' | 'profile';
 	// Disable hreflang alternates on pages that don't exist in the other locale (e.g. tag pages).
 	alternates?: boolean;
+	// Keep thin or utility pages (single-post tags, 404) out of search results.
+	noindex?: boolean;
+	// Trail from the home page to this page, emitted as BreadcrumbList JSON-LD.
+	breadcrumbs?: { name: string; url: string }[];
 }
 
 const locale = Astro.currentLocale || 'en';
@@ -39,6 +45,8 @@ const {
 	article,
 	pageType = 'website',
 	alternates = true,
+	noindex = false,
+	breadcrumbs = [],
 } = Astro.props;
 
 const imageURL = new URL(typeof image === 'string' ? image : image.src, Astro.site);
@@ -88,7 +96,16 @@ const primaryEntity = article
 			keywords: article.tags?.join(', '),
 			inLanguage: language,
 			author: { '@id': personId },
-			isPartOf: { '@id': websiteId },
+			isPartOf: article.series
+				? [
+						{ '@id': websiteId },
+						{
+							'@type': 'CreativeWorkSeries',
+							name: article.series.name,
+							url: new URL(article.series.url, Astro.site).toString(),
+						},
+					]
+				: { '@id': websiteId },
 		}
 	: pageType === 'profile'
 		? {
@@ -103,9 +120,22 @@ const primaryEntity = article
 			}
 		: website;
 
+const breadcrumbList = breadcrumbs.length > 0 && {
+	'@type': 'BreadcrumbList',
+	itemListElement: breadcrumbs.map((crumb, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: crumb.name,
+		item: new URL(crumb.url, Astro.site).toString(),
+	})),
+};
+
 const jsonLd = {
 	'@context': 'https://schema.org',
-	'@graph': primaryEntity === website ? [website, person] : [primaryEntity, website, person],
+	'@graph': [
+		...(primaryEntity === website ? [website, person] : [primaryEntity, website, person]),
+		...(breadcrumbList ? [breadcrumbList] : []),
+	],
 };
 ---
 
@@ -151,14 +181,14 @@ const jsonLd = {
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
-<meta name="title" content={title} />
 <meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex, follow" />}
 <meta name="author" content={AUTHOR_NAME} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={SITE_TITLE} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageURL} />
@@ -179,10 +209,11 @@ const jsonLd = {
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content={Astro.url} />
+<meta name="twitter:url" content={canonicalURL} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageURL} />
+<meta name="twitter:site" content={X_HANDLE} />
 <meta name="twitter:creator" content={X_HANDLE} />
 
 <!-- Structured data -->

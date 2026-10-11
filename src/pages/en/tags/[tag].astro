@@ -6,32 +6,34 @@ import FormattedDate from '../../../components/FormattedDate.astro';
 import Header from '../../../components/Header.astro';
 import { SITE_TITLE } from '../../../consts';
 import { t } from '../../../i18n/translations';
+import { localePosts, postUrl, tagGroups } from '../../../lib/blog';
+import { MIN_INDEXED_TAG_POSTS } from '../../../lib/tags';
 
 export async function getStaticPaths() {
   const locale = 'en';
-  const posts = (await getCollection('blog', (entry) => entry.id.startsWith(locale + '/'))).filter(
-    (p) => !p.data.draft
-  );
-  const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
-  return tags.map((tag) => ({
-    params: { tag },
-    props: {
-      posts: posts
-        .filter((p) => p.data.tags.includes(tag))
-        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
-    },
+  const posts = localePosts(await getCollection('blog'), locale);
+  return tagGroups(posts).map((group) => ({
+    params: { tag: group.slug },
+    props: { name: group.name, posts: group.posts },
   }));
 }
 
 const locale = 'en';
-const { tag } = Astro.params;
-const { posts } = Astro.props;
+const { name, posts } = Astro.props;
+const description = t('tags.tagMeta', locale)
+  .replace('{tag}', name)
+  .replace('{n}', String(posts.length));
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`#${tag} — ${SITE_TITLE}`} description={`Posts tagged #${tag}`} alternates={false} />
+    <BaseHead
+      title={`#${name} — ${SITE_TITLE}`}
+      description={description}
+      alternates={false}
+      noindex={posts.length < MIN_INDEXED_TAG_POSTS}
+    />
     <style>
       .post-list { list-style: none; margin: 0; padding: 0; }
       .post-item { margin-bottom: 0; }
@@ -86,11 +88,11 @@ const { posts } = Astro.props;
     <Header />
     <main>
       <p class="animate-in"><a class="back" href={`/${locale}/tags/`}>← {t('tags.allTags', locale)}</a></p>
-      <h1 class="animate-in"><span class="hash">#</span>{tag}</h1>
+      <h1 class="animate-in"><span class="hash">#</span>{name}</h1>
       <ul class="post-list stagger">
         {posts.map((post) => (
           <li class="post-item">
-            <a class="post-link" href={`/${locale}/blog/${post.id.replace(locale + '/', '')}`}>
+            <a class="post-link" href={postUrl(post, locale)}>
               <h3 class="post-title">{post.data.title}</h3>
               {post.data.description && <p class="post-desc">{post.data.description}</p>}
               <p class="post-date"><FormattedDate date={post.data.pubDate} /></p>

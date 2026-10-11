@@ -8,13 +8,36 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import { sitemapMeta } from './src/lib/sitemap-meta';
+
+const SITE = 'https://toddzheng.net';
+const { lastmod, thinTagPaths } = sitemapMeta(['en', 'zh']);
+
+// Astro only optimizes remote Markdown images by absolute URL, so point root-relative
+// /media/ images (R2, served by the worker) at the site origin.
+function remarkAbsoluteMedia() {
+	const walk = (node) => {
+		if (node.type === 'image' && node.url.startsWith('/media/')) node.url = SITE + node.url;
+		node.children?.forEach(walk);
+	};
+	return walk;
+}
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://toddzheng.net',
+	site: SITE,
+	// Every page is a directory index; links without the slash would cost a redirect.
+	trailingSlash: 'always',
 	integrations: [mdx(), sitemap({
-		// The bare root is a 301 to /en/ — keep it out of the sitemap.
-		filter: (page) => page !== 'https://toddzheng.net/',
+		// The bare root is a 301 to /en/, and single-post tag pages are noindexed.
+		filter: (page) => {
+			const path = decodeURI(new URL(page).pathname);
+			return path !== '/' && path !== '/404/' && !thinTagPaths.has(path);
+		},
+		serialize: (item) => {
+			const modified = lastmod.get(decodeURI(new URL(item.url).pathname));
+			return modified ? { ...item, lastmod: modified.toISOString() } : item;
+		},
 		i18n: {
 			defaultLocale: 'en',
 			locales: {
@@ -30,6 +53,11 @@ export default defineConfig({
 			prefixDefaultLocale: true,
 		},
 	},
+	image: {
+		// Post images live in R2 behind /media/. Authorizing the domain lets Astro fetch them at
+		// build time, so Markdown images ship as sized, lazy-loaded WebP instead of raw PNGs.
+		domains: ['toddzheng.net'],
+	},
 	vite: {
 		preview: {
 			allowedHosts: ['todds-mac-mini.local', 'todds-mac-mini.tail961bf8.ts.net', '.local', '.ts.net'],
@@ -37,7 +65,7 @@ export default defineConfig({
 	},
 	markdown: {
 		processor: unified({
-			remarkPlugins: [remarkMath],
+			remarkPlugins: [remarkMath, remarkAbsoluteMedia],
 			rehypePlugins: [
 				rehypeKatex,
 				rehypeSlug,

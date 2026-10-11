@@ -9,7 +9,7 @@ const dict: Record<string, Record<string, string>> = {
   'nav.projects':   { en: 'Projects',   zh: '项目' },
   'rss.link': { en: 'Subscribe via RSS', zh: 'RSS 订阅' },
   'rss.heading': { en: 'Keep up with new writing', zh: '订阅新文章' },
-  'rss.description': { en: 'Get new article summaries in your RSS reader. Add the feed address below to subscribe.', zh: '在 RSS 阅读器里接收新文章摘要。将下方地址添加到阅读器，即可订阅。' },
+  'rss.description': { en: 'Read new articles in full in your RSS reader. Add the feed address below to subscribe.', zh: '在 RSS 阅读器里阅读新文章全文。将下方地址添加到阅读器，即可订阅。' },
 
   // Command palette
   'palette.trigger':      { en: 'Search', zh: '搜索' },
@@ -190,9 +190,33 @@ const dict: Record<string, Record<string, string>> = {
   // Tags
   'tags.heading': { en: 'Tags', zh: '标签' },
   'tags.allTags': { en: 'All tags', zh: '全部标签' },
+  'tags.meta': {
+    en: 'Browse every topic Todd Zheng writes about — AI agents, software engineering, internet history and more.',
+    zh: '按主题浏览 Todd Zheng 的全部文章：AI Agent、软件工程、互联网历史等。',
+  },
+  'tags.tagMeta': {
+    en: 'Writing by Todd Zheng tagged #{tag} ({n} in total).',
+    zh: 'Todd Zheng 标签为 #{tag} 的 {n} 篇文章。',
+  },
+
+  // Blog index
+  'blog.meta': {
+    en: 'Essays by Todd Zheng on AI agents, developer tools, software engineering, and the history of the internet.',
+    zh: 'Todd Zheng 的文章：AI Agent、开发者工具、软件工程，以及互联网历史。',
+  },
+
+  // 404
+  'notFound.title':   { en: 'Page not found', zh: '页面不存在' },
+  'notFound.body':    { en: "The page you're looking for doesn't exist or has moved.", zh: '你要找的页面不存在，或者已经被移动。' },
+  'notFound.home':    { en: 'Back to home', zh: '返回首页' },
+  'notFound.blog':    { en: 'Browse all writing', zh: '浏览全部文章' },
 
   // Projects page
   'projects.heading':  { en: 'Projects',       zh: '项目' },
+  'projects.meta': {
+    en: 'Products and open-source projects by Todd Zheng: AI developer tools, agent platforms, and independent software.',
+    zh: 'Todd Zheng 的产品与开源项目：AI 开发者工具、Agent 平台和独立软件。',
+  },
   'projects.featured': { en: "Products I've built", zh: '我做的产品' },
   'projects.recent':   { en: 'On GitHub', zh: 'GitHub 项目' },
   'projects.pax.desc': {

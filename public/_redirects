@@ -2,3 +2,21 @@
 # Real 301s instead of the meta-refresh fallback in src/pages/index.astro.
 / /en/ 301
 /rss.xml /en/rss.xml 301
+
+# Tag pages moved to lowercase, hyphenated slugs (src/lib/tags.ts).
+/en/tags/AI/ /en/tags/ai/ 301
+/en/tags/Dotcom/ /en/tags/dotcom/ 301
+/en/tags/HTML/ /en/tags/html/ 301
+/en/tags/History%20of%20Technology/ /en/tags/history-of-technology/ 301
+/en/tags/Hypertext/ /en/tags/hypertext/ 301
+/en/tags/Internet%20History/ /en/tags/internet-history/ 301
+/en/tags/World%20Wide%20Web/ /en/tags/world-wide-web/ 301
+/en/tags/Xanadu/ /en/tags/xanadu/ 301
+/zh/tags/AI/ /zh/tags/ai/ 301
+/zh/tags/Agent/ /zh/tags/agent/ 301
+/zh/tags/CLI/ /zh/tags/cli/ 301
+/zh/tags/Dotcom/ /zh/tags/dotcom/ 301
+/zh/tags/HTML/ /zh/tags/html/ 301
+/zh/tags/MCP/ /zh/tags/mcp/ 301
+/zh/tags/Software%203.0/ /zh/tags/software-3.0/ 301
+/zh/tags/Xanadu/ /zh/tags/xanadu/ 301
