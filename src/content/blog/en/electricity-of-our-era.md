@@ -1,6 +1,6 @@
 ---
 title: "The Electricity of Our Era"
-description: "Token supply is the electricity of our era — on AI democratization, diminishing returns, and why agent harnesses must be provider-agnostic."
+description: "Token supply is the electricity of our era — on token economics, AI agent token cost, democratization, diminishing returns, and why agent harnesses must be provider-agnostic."
 pubDate: 2026-06-16
 tags: ["ai", "llm", "anthropic", "token-economics", "democratization", "technology"]
 ---

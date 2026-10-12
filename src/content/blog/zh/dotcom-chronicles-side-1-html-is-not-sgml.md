@@ -2,7 +2,6 @@
 title: "Dotcom编年史 番外一：HTML 不是 SGML"
 description: "1992 年，一个在得州做文档工具的工程师在邮件列表上追问：一页纸的标签清单，要不要变成有人验证的标准？跟着 Dan Connolly 的信，看 HTML 怎样从“像 SGML”走到 RFC 1866。"
 pubDate: 2026-09-09T04:40:18Z
-updatedDate: 2026-09-09
 tags: ["互联网历史", "Dotcom", "科技史", "万维网", "HTML"]
 series: dotcom-chronicles
 seriesOrder: 4

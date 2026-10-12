@@ -1,0 +1,149 @@
+# ToddTalk — Full Context
+
+> Personal bilingual site of Todd Zheng (郑秋石) at https://toddzheng.net/ — AI agents, developer tools, software engineering, and internet history.
+
+Last updated: 2026-10-12
+
+No traffic, ranking, or subscriber counts are claimed here. Prefer live pages and RSS over this file when content may have changed.
+
+## Site map (key pages)
+
+- https://toddzheng.net/en/ — English homepage
+- https://toddzheng.net/zh/ — Chinese homepage
+- https://toddzheng.net/en/about/ — About (EN)
+- https://toddzheng.net/zh/about/ — About (ZH)
+- https://toddzheng.net/en/projects/ — Projects (EN)
+- https://toddzheng.net/zh/projects/ — Projects (ZH)
+- https://toddzheng.net/en/blog/ — Blog index (EN)
+- https://toddzheng.net/zh/blog/ — Blog index (ZH)
+- https://toddzheng.net/en/series/ — Series index (EN)
+- https://toddzheng.net/zh/series/ — Series index (ZH)
+- https://toddzheng.net/en/series/dotcom-chronicles/ — Dotcom Chronicles series (EN)
+- https://toddzheng.net/zh/series/dotcom-chronicles/ — Dotcom 编年史 series (ZH)
+- https://toddzheng.net/en/rss.xml — English RSS
+- https://toddzheng.net/zh/rss.xml — Chinese RSS
+- https://toddzheng.net/sitemap-index.xml — Sitemap index
+- https://toddzheng.net/llms.txt — Short agent entrypoint
+
+## English posts
+
+### The AI Era Doesn't Need Code Monkeys — It Needs Pioneers
+- URL: https://toddzheng.net/en/blog/ai-era-pioneers/
+- Summary: LeetCode can't find the engineers we actually need. On abstraction, openness, and what happens when AI makes everyone a builder.
+
+### Dotcom Chronicles (1): The Web Began with a Problem of Finding Things
+- URL: https://toddzheng.net/en/blog/dotcom-chronicles-1-finding-things/
+- Summary: In 1989, turnover at CERN kept separating documents from the people who could explain them. Starting from that problem, Berners-Lee wrote a proposal, a browser, and the first website, and in 1991 sent the invitation out.
+
+### Dotcom Chronicles (2): I Was Just Hoping It Would Survive at SLAC
+- URL: https://toddzheng.net/en/blog/dotcom-chronicles-2-survive-at-slac/
+- Summary: In December 1991 a free Web server came up on a library account at SLAC. Three and a half months in Louise Addis's inbox show who looked after it once the man who brought it went back to his own work.
+
+### Dotcom Chronicles (3): You Can't Set Up a System of Bidirectional Links
+- URL: https://toddzheng.net/en/blog/dotcom-chronicles-3-bidirectional-links/
+- Summary: In 1991 the hypertext experts said the Web's links went one way and could break at any time. Berners-Lee knew what they wanted; he had built the two-way kind himself in 1980. His letters on the mailing list in 1992 and 1993 explain why he built links that break anyway, and what he put in their place.
+
+### Preface: I Once Worked in Netscape’s Building
+- URL: https://toddzheng.net/en/blog/dotcom-chronicles-preface/
+- Summary: A documentary shot revealed that my everyday office had once been Netscape’s. That discovery led me into the dotcom era—and toward questions worth revisiting in the age of AI and agents.
+
+### Dotcom Chronicles, Side Story 1: HTML Is Not SGML
+- URL: https://toddzheng.net/en/blog/dotcom-chronicles-side-1-html-is-not-sgml/
+- Summary: In 1992 an engineer building documentation tools in Texas kept asking the mailing list one question: should a one-page list of tags become a standard that somebody validates? Dan Connolly's letters, from "HTML is not SMGL" to RFC 1866.
+
+### Dotcom Chronicles, Side Story 2: Code Is Due Out "Any Time Now"
+- URL: https://toddzheng.net/en/blog/dotcom-chronicles-side-2-code-due-any-time-now/
+- Summary: In 1992 CERN's website said the code for Xanadu was due out "any time now." Ted Nelson's hypertext system, with links that never break and royalties by the byte, was promised in 18 months in 1988, released as code in 1999 and made clickable in 2014. Following Nelson from his idea in 1960 to 2026, this piece asks why it never got built.
+
+### The Electricity of Our Era
+- URL: https://toddzheng.net/en/blog/electricity-of-our-era/
+- Summary: Token supply is the electricity of our era — on token economics, AI agent token cost, democratization, diminishing returns, and why agent harnesses must be provider-agnostic.
+
+### Should Go Still Hold On to Its Philosophy?
+- URL: https://toddzheng.net/en/blog/golang-philosophy-crossroads/
+- Summary: Go stands at a crossroads: double down on radical simplicity, or finally embrace more abstraction? No language gets to stay pure forever.
+
+### With Scientific Rigor, with an Amateur's Spirit
+- URL: https://toddzheng.net/en/blog/scientific-discipline-amateur-spirit/
+- Summary: Don't outsource your thinking to "them" — on independent thought, questioning authority, and what the fringe amateur scientists get right.
+
+### Skill + CLI Considered Harmful — MCP vs Skills vs CLI
+- URL: https://toddzheng.net/en/blog/skill-cli-considered-harmful/
+- Summary: MCP vs Skills vs CLI: why agent integrations that ship a Skill plus a CLI look easy but return the version-control problem the web already solved. A Considered Harmful take on fat-client agent tooling versus updatable MCP.
+
+### Software 3.0 Workshop — Agent Automation Economics
+- URL: https://toddzheng.net/en/blog/software-3-0-workshop-2026-08-29/
+- Summary: Software 3.0 and code-generating agents are changing automation economics: every genuine niche need is now worth building and testing. Written version of the 2026-08-29 workshop.
+
+### The Spectrum
+- URL: https://toddzheng.net/en/blog/spectrum/
+- Summary: From vague needs to concrete implementation, each person covers only part of the spectrum. AI shortens that distance and forces a choice between depth and breadth.
+
+### What Kind of People Make Up a Team?
+- URL: https://toddzheng.net/en/blog/team-composition/
+- Summary: From WoW raid guilds to software engineering — idealists, steady operators, and fringe members. And why AI makes lean teams possible again.
+
+## Chinese posts
+
+### AI 时代需要的不是码农，而是先行者
+- URL: https://toddzheng.net/zh/blog/ai-era-pioneers/
+- Summary: LeetCode 筛不出我们真正需要的人。关于抽象能力、开放心态，以及当 AI 让每个人都能构建产品时，软件工程师到底该做什么。
+
+### Dotcom编年史 (一)：万维网从一个找资料的问题开始
+- URL: https://toddzheng.net/zh/blog/dotcom-chronicles-1-finding-things/
+- Summary: 1989 年，CERN 的人员流动让资料和能解释资料的人分开。Berners-Lee 从这个找资料的问题出发，写出提案、浏览器和第一个网站，并在 1991 年把邀请发到了外面。
+
+### Dotcom编年史 (二)：只盼它能在 SLAC 活下来
+- URL: https://toddzheng.net/zh/blog/dotcom-chronicles-2-survive-at-slac/
+- Summary: 1991 年 12 月，一台免费送来的 Web 服务器在 SLAC 图书馆的账号上跑起来。跟着 Louise Addis 的收件箱走三个半月，看引进它的人走后，谁接着管，它怎样活下来。
+
+### Dotcom编年史 (三)：没法做一套双向链接
+- URL: https://toddzheng.net/zh/blog/dotcom-chronicles-3-bidirectional-links/
+- Summary: 1991 年，超文本行家说 Web 的链接只有一个方向、随时会断。Berners-Lee 知道他们要的是什么，1980 年他自己就做过双向的那种。跟着他 1992 到 1993 年在邮件列表上的信，看他为什么还是做了一套会断的链接，拿什么代替。
+
+### 前言：我曾在 Netscape 的大楼里上班
+- URL: https://toddzheng.net/zh/blog/dotcom-chronicles-preface/
+- Summary: 一个纪录片镜头，让我发现自己每天上班的大楼曾属于 Netscape。由此开始，回看 Dotcom 的兴起与崩落，也为今天的 AI 与 Agent 热潮多找一些思考的依据。
+
+### Dotcom编年史 番外一：HTML 不是 SGML
+- URL: https://toddzheng.net/zh/blog/dotcom-chronicles-side-1-html-is-not-sgml/
+- Summary: 1992 年，一个在得州做文档工具的工程师在邮件列表上追问：一页纸的标签清单，要不要变成有人验证的标准？跟着 Dan Connolly 的信，看 HTML 怎样从“像 SGML”走到 RFC 1866。
+
+### Dotcom编年史 番外二：代码“随时”发布
+- URL: https://toddzheng.net/zh/blog/dotcom-chronicles-side-2-code-due-any-time-now/
+- Summary: 1992 年 CERN 网站说，Xanadu 的代码“随时”发布。这套要让链接永远不断、引用按字节付费的超文本系统，1988 年说 18 个月，1999 年才放出代码，2014 年才有能点开的版本。跟着 Ted Nelson 从 1960 年的念头一路走到 2026 年，看它为什么一直没做出来。
+
+### 我们时代的电力
+- URL: https://toddzheng.net/zh/blog/electricity-of-our-era/
+- Summary: Token 是新时代的电力——关于 token economics、Agent token 成本、AI 普及、边际效用递减，以及为什么 Agent 设计必须不依赖任何一家模型厂商。
+
+### Golang是否还要维持自己的哲学？
+- URL: https://toddzheng.net/zh/blog/golang-philosophy-crossroads/
+- Summary: Go语言走到了十字路口：继续保持极致简单，还是接受更多抽象？没有任何一门语言能永远不妥协。
+
+### 以科学的态度，以民科的精神
+- URL: https://toddzheng.net/zh/blog/scientific-discipline-amateur-spirit/
+- Summary: 不要把思考交给"他们"——关于独立思考、质疑权威，以及民科身上值得我们保留的东西。
+
+### Skill + CLI Considered Harmful：MCP vs Skills vs CLI
+- URL: https://toddzheng.net/zh/blog/skill-cli-considered-harmful/
+- Summary: MCP vs Skills vs CLI：为什么用 Skill 加 CLI 给 Agent 做集成看起来好用，却把版本控制问题重新发回用户电脑，而可更新的 MCP 更能守住服务端控制权。一篇 Considered Harmful 视角的对照。
+
+### Software 3.0 Workshop — Agent 自动化的经济性
+- URL: https://toddzheng.net/zh/blog/software-3-0-workshop-2026-08-29/
+- Summary: Software 3.0 与能够生成代码的 Agent 正在改变自动化的经济性：每一个真实的 niche 需求，都值得被做出来验证一次。2026-08-29 Workshop 文字版。
+
+### 光谱
+- URL: https://toddzheng.net/zh/blog/spectrum/
+- Summary: 从模糊需求到具体实现，每个人只能覆盖其中一段。AI 缩短了这条光谱，也让个人面临做深或做广的选择。
+
+### 团队是由什么样的人构成的？
+- URL: https://toddzheng.net/zh/blog/team-composition/
+- Summary: 从魔兽世界公会团到软件工程团队——理想主义者、稳定执行者和边缘成员，以及AI让精干团队重新可能
+
+## Author profiles
+
+- GitHub: https://github.com/qiz029
+- Bilibili: https://space.bilibili.com/390147
+- LinkedIn: https://www.linkedin.com/in/toddzheng-024/
+- X: https://x.com/ShiZheng24517

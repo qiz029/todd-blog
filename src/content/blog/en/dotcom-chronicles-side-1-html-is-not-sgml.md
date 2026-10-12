@@ -2,7 +2,6 @@
 title: "Dotcom Chronicles, Side Story 1: HTML Is Not SGML"
 description: "In 1992 an engineer building documentation tools in Texas kept asking the mailing list one question: should a one-page list of tags become a standard that somebody validates? Dan Connolly's letters, from \"HTML is not SMGL\" to RFC 1866."
 pubDate: 2026-09-09T04:40:18Z
-updatedDate: 2026-09-09
 tags: ["Internet History", "Dotcom", "History of Technology", "World Wide Web", "HTML"]
 series: dotcom-chronicles
 seriesOrder: 4

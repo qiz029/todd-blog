@@ -2,7 +2,6 @@
 title: "Dotcom Chronicles (3): You Can't Set Up a System of Bidirectional Links"
 description: "In 1991 the hypertext experts said the Web's links went one way and could break at any time. Berners-Lee knew what they wanted; he had built the two-way kind himself in 1980. His letters on the mailing list in 1992 and 1993 explain why he built links that break anyway, and what he put in their place."
 pubDate: 2026-09-11T08:10:40Z
-updatedDate: 2026-09-11
 tags: ["Internet History", "Dotcom", "History of Technology", "World Wide Web", "Hypertext"]
 series: dotcom-chronicles
 seriesOrder: 5

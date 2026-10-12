@@ -2,7 +2,6 @@
 title: "Dotcom编年史 (三)：没法做一套双向链接"
 description: "1991 年，超文本行家说 Web 的链接只有一个方向、随时会断。Berners-Lee 知道他们要的是什么，1980 年他自己就做过双向的那种。跟着他 1992 到 1993 年在邮件列表上的信，看他为什么还是做了一套会断的链接，拿什么代替。"
 pubDate: 2026-09-11T08:10:40Z
-updatedDate: 2026-09-11
 tags: ["互联网历史", "Dotcom", "科技史", "万维网", "超文本"]
 series: dotcom-chronicles
 seriesOrder: 5

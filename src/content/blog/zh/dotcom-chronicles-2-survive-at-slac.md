@@ -2,7 +2,6 @@
 title: "Dotcom编年史 (二)：只盼它能在 SLAC 活下来"
 description: "1991 年 12 月，一台免费送来的 Web 服务器在 SLAC 图书馆的账号上跑起来。跟着 Louise Addis 的收件箱走三个半月，看引进它的人走后，谁接着管，它怎样活下来。"
 pubDate: 2026-09-09T04:39:18Z
-updatedDate: 2026-09-09
 tags: ["互联网历史", "Dotcom", "科技史", "万维网"]
 series: dotcom-chronicles
 seriesOrder: 3

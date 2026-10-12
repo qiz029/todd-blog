@@ -1,6 +1,6 @@
 ---
-title: "2026-08-29 Workshop — Written Version"
-description: "Automation is hard, but Software 3.0 and code-generating agents are changing its economics: every genuine niche need is now worth building and testing."
+title: "Software 3.0 Workshop — Agent Automation Economics"
+description: "Software 3.0 and code-generating agents are changing automation economics: every genuine niche need is now worth building and testing. Written version of the 2026-08-29 workshop."
 pubDate: 2026-08-29
 updatedDate: 2026-09-01
 heroImage: "https://toddzheng.net/media/01-manual-friction-4e9df1fe.png"

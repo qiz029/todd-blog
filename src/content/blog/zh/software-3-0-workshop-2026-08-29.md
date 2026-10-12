@@ -1,6 +1,6 @@
 ---
-title: "2026-08-29 Workshop文字版"
-description: "自动化很难，但 Software 3.0 与能够生成代码的 Agent 正在改变软件的经济性：每一个真实的 niche 需求，都值得被做出来验证一次。"
+title: "Software 3.0 Workshop — Agent 自动化的经济性"
+description: "Software 3.0 与能够生成代码的 Agent 正在改变自动化的经济性：每一个真实的 niche 需求，都值得被做出来验证一次。2026-08-29 Workshop 文字版。"
 pubDate: 2026-08-29
 updatedDate: 2026-09-01
 heroImage: "https://toddzheng.net/media/01-manual-friction-4e9df1fe.png"

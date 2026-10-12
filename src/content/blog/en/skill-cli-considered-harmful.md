@@ -1,8 +1,7 @@
 ---
-title: "Skill + CLI Considered Harmful"
-description: "More and more platforms integrate with agents by shipping a Skill plus a CLI. It works, but it ships the version problem back to the user's machine, a problem the web already solved once."
+title: "Skill + CLI Considered Harmful — MCP vs Skills vs CLI"
+description: "MCP vs Skills vs CLI: why agent integrations that ship a Skill plus a CLI look easy but return the version-control problem the web already solved. A Considered Harmful take on fat-client agent tooling versus updatable MCP."
 pubDate: 2026-09-19T07:23:30Z
-updatedDate: 2026-09-19
 tags: ["ai", "agents", "cli", "mcp", "software-engineering"]
 ---
 

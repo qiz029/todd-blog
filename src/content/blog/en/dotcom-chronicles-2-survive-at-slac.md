@@ -2,7 +2,6 @@
 title: "Dotcom Chronicles (2): I Was Just Hoping It Would Survive at SLAC"
 description: "In December 1991 a free Web server came up on a library account at SLAC. Three and a half months in Louise Addis's inbox show who looked after it once the man who brought it went back to his own work."
 pubDate: 2026-09-09T04:39:18Z
-updatedDate: 2026-09-09
 tags: ["Internet History", "Dotcom", "History of Technology", "World Wide Web"]
 series: dotcom-chronicles
 seriesOrder: 3

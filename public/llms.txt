@@ -1,0 +1,35 @@
+# ToddTalk (toddzheng.net)
+
+> Personal site of Todd Zheng (郑秋石): essays and notes on AI agents, developer tools, software engineering, and internet history. Bilingual English and Chinese.
+
+Canonical site: https://toddzheng.net/
+Author: Todd Zheng / 郑秋石
+
+## Primary
+
+- [English homepage](https://toddzheng.net/en/): English entry. Chinese homepage: https://toddzheng.net/zh/
+- [About (EN)](https://toddzheng.net/en/about/): Profile and background. Chinese: https://toddzheng.net/zh/about/
+- [Projects (EN)](https://toddzheng.net/en/projects/): Products and open-source work. Chinese: https://toddzheng.net/zh/projects/
+- [Blog index (EN)](https://toddzheng.net/en/blog/): All English posts. Chinese: https://toddzheng.net/zh/blog/
+- [Series index (EN)](https://toddzheng.net/en/series/): Published series. Chinese: https://toddzheng.net/zh/series/
+
+## Featured writing
+
+- [Skill + CLI Considered Harmful — MCP vs Skills vs CLI](https://toddzheng.net/en/blog/skill-cli-considered-harmful/): Why Skill+CLI agent integrations reintroduce fat-client version drift; MCP comparison. Chinese: https://toddzheng.net/zh/blog/skill-cli-considered-harmful/
+- [The Electricity of Our Era](https://toddzheng.net/en/blog/electricity-of-our-era/): Token economics and provider-agnostic agent harnesses. Chinese: https://toddzheng.net/zh/blog/electricity-of-our-era/
+- [Software 3.0 Workshop — Agent Automation Economics](https://toddzheng.net/en/blog/software-3-0-workshop-2026-08-29/): How Software 3.0 changes when niche automation is worth building. Chinese: https://toddzheng.net/zh/blog/software-3-0-workshop-2026-08-29/
+- [The Dotcom Chronicles (series)](https://toddzheng.net/en/series/dotcom-chronicles/): From the birth of the Web through early web history. Chinese series: https://toddzheng.net/zh/series/dotcom-chronicles/
+
+## Feeds and machine-readable indexes
+
+- [English RSS](https://toddzheng.net/en/rss.xml)
+- [Chinese RSS](https://toddzheng.net/zh/rss.xml)
+- [XML sitemap](https://toddzheng.net/sitemap-index.xml)
+- [Full site context](https://toddzheng.net/llms-full.txt): Longer bilingual page list for agents.
+
+## Elsewhere
+
+- GitHub: https://github.com/qiz029
+- Bilibili: https://space.bilibili.com/390147
+- LinkedIn: https://www.linkedin.com/in/toddzheng-024/
+- X: https://x.com/ShiZheng24517

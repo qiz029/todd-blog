@@ -1,8 +1,7 @@
 ---
-title: "Skill + CLI Considered Harmful"
-description: "越来越多的平台用 Skill 加 CLI 给 Agent 做集成。它好用，但把版本控制的问题重新发回了用户的电脑，而这个问题，软件行业过去 20 年已经用 web 解决过一次了。"
+title: "Skill + CLI Considered Harmful：MCP vs Skills vs CLI"
+description: "MCP vs Skills vs CLI：为什么用 Skill 加 CLI 给 Agent 做集成看起来好用，却把版本控制问题重新发回用户电脑，而可更新的 MCP 更能守住服务端控制权。一篇 Considered Harmful 视角的对照。"
 pubDate: 2026-09-19T07:23:30Z
-updatedDate: 2026-09-19
 tags: ["AI", "Agent", "CLI", "MCP", "软件工程"]
 ---
 

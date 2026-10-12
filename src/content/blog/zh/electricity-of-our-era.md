@@ -1,6 +1,6 @@
 ---
 title: "我们时代的电力"
-description: 'Token 是新时代的电力——关于 AI 普及、边际效用递减，以及为什么 Agent 设计必须不依赖任何一家模型厂商。'
+description: "Token 是新时代的电力——关于 token economics、Agent token 成本、AI 普及、边际效用递减，以及为什么 Agent 设计必须不依赖任何一家模型厂商。"
 pubDate: 2026-06-16
 tags: ["ai", "llm", "anthropic", "token-economics", "democratization", "technology"]
 ---
