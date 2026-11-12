@@ -91,3 +91,11 @@ This is <mark>highlighted in yellow</mark>.
 ```
 
 Highlights wrap across lines. The `==text==` shorthand is not supported.
+
+## Editorial homepage and history archive
+
+`src/components/HomeHub.astro` curates the lead essay, Dotcom series, and independent-thinking essay by content ID. Picks are resolved from published content in the current locale; draft or missing entries are omitted. Latest writing, series counts, and reading times come from the content collections.
+
+`EditorialCover.astro` contains the original vector cover designs, including portrait compositions for small cards. The covers need no image service, additional fonts, or browser scripts. Both homepage routes use the wider magazine layout; article reading widths are unchanged.
+
+`DotcomArchive.astro` provides the Dotcom-specific series presentation. Its historical-period labels and timeline links are editorial metadata, separate from article publication dates and series reading order. Update these when adding chapters. The planned 1989–2004 span is labeled separately from published coverage, and the 1989 proposal image retains its source and license attribution. Other series keep the standard layout.

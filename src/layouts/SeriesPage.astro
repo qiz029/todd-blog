@@ -1,4 +1,5 @@
 ---
+import DotcomArchive from '../components/DotcomArchive.astro';
 import { Image } from 'astro:assets';
 import { type CollectionEntry, render } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
@@ -39,6 +40,7 @@ const updated = posts.reduce<Date | undefined>((latest, p) => {
       alternates={alternates}
     />
     <style>
+      main.archive { width: 1120px; }
       .back {
         font-family: var(--font-jetbrains), monospace;
         font-size: 0.85em;
@@ -212,7 +214,8 @@ const updated = posts.reduce<Date | undefined>((latest, p) => {
   </head>
   <body>
     <Header />
-    <main>
+    <main class:list={{ archive: slug === 'dotcom-chronicles' }}>
+      {slug === 'dotcom-chronicles' ? <DotcomArchive locale={locale} entry={entry} posts={posts} /> : <>
       <p class="animate-in"><a class="back" href={`/${locale}/series/`}>← {t('series.allSeries', locale)}</a></p>
 
       <section class="cover animate-in">
@@ -277,6 +280,7 @@ const updated = posts.reduce<Date | undefined>((latest, p) => {
           )}
         </ol>
       )}
+      </>}
     </main>
     <Footer locale={locale} />
   </body>

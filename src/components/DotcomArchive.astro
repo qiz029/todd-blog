@@ -1,0 +1,149 @@
+---
+import { Image } from 'astro:assets';
+import { type CollectionEntry, render } from 'astro:content';
+import { postUrl, readingStats } from '../lib/blog';
+import { t } from '../i18n/translations';
+import EditorialCover from './EditorialCover.astro';
+interface Props { locale: string; entry: CollectionEntry<'series'>; posts: CollectionEntry<'blog'>[]; }
+const { locale, entry, posts } = Astro.props;
+const zh = locale === 'zh';
+const { Content } = await render(entry);
+// These are historical subjects, not publication dates; side stories deliberately overlap.
+const subjects: Record<string, { period: string; en: string; zh: string }> = {
+  'dotcom-chronicles-preface': { period: 'PREFACE', en: 'An unexpected starting point', zh: '一个意外的起点' },
+  'dotcom-chronicles-1-finding-things': { period: '1989–1991', en: 'CERN / Finding things', zh: 'CERN / 寻找信息' },
+  'dotcom-chronicles-2-survive-at-slac': { period: '1991–1992', en: 'SLAC / Keeping it alive', zh: 'SLAC / 让它活下来' },
+  'dotcom-chronicles-side-1-html-is-not-sgml': { period: '1992–1995', en: 'Side story / HTML', zh: '番外 / HTML' },
+  'dotcom-chronicles-3-bidirectional-links': { period: '1991–1993', en: 'Hypertext / Broken links', zh: '超文本 / 会断的链接' },
+  'dotcom-chronicles-side-2-code-due-any-time-now': { period: '1960–2026', en: 'Side story / Xanadu', zh: '番外 / Xanadu' },
+};
+const trail = [
+  { year: '1989', en: 'A proposal at CERN', zh: 'CERN 的一份提案', slug: 'dotcom-chronicles-1-finding-things' },
+  { year: '1991', en: 'Across the Atlantic', zh: '跨越大西洋', slug: 'dotcom-chronicles-2-survive-at-slac' },
+  { year: '1992', en: 'What should HTML be?', zh: 'HTML 应该是什么？', slug: 'dotcom-chronicles-side-1-html-is-not-sgml' },
+  { year: '1993', en: 'The price of a link', zh: '一条链接的代价', slug: 'dotcom-chronicles-3-bidirectional-links' },
+].filter(item => posts.some(p => p.id === `${locale}/${item.slug}`));
+const totalMinutes = posts.reduce((sum, p) => sum + readingStats(p.body ?? '').minutes, 0);
+---
+<div class="dotcom-archive">
+  <div class="archive-topline"><a href={`/${locale}/series/`}>← {t('series.allSeries', locale)}</a><span>TODDTALK / HISTORY FILES</span></div>
+  <section class="archive-cover animate-in" aria-labelledby="archive-title">
+    <div class="cover-copy">
+      <p class="label"><span class="status-dot" aria-hidden="true"></span>{t(`series.${entry.data.status}`, locale)} · {zh ? '互联网历史' : 'INTERNET HISTORY'}</p>
+      <h1 id="archive-title">{entry.data.title}</h1>
+      <p class="lede">{zh ? '当未来还没有\n成为日常。' : 'Before the future\nbecame ordinary.'}</p>
+      <p class="description">{entry.data.description}</p>
+      {posts[0] && <a class="start-reading" href={postUrl(posts[0], locale)}>{t('series.start', locale)} <span aria-hidden="true">↗</span></a>}
+      <p class="cover-meta">{posts.length} {zh ? '篇已发布' : 'published essays'} <span>/</span> {totalMinutes} {zh ? '分钟阅读' : 'min reading'}</p>
+    </div>
+    <div class="cover-art"><EditorialCover variant="archive" /><div class="cover-caption"><span>1989 → 2004</span><span>{zh ? '系列计划覆盖年代' : 'PLANNED SERIES SPAN'}</span></div></div>
+  </section>
+
+  {trail.length > 0 && <nav class="history-trail" aria-label={zh ? '按历史阶段探索已发布文章' : 'Explore published essays by historical period'}>
+    <p class="label">{zh ? '从这些时刻进入' : 'MOMENTS TO EXPLORE'}</p>
+    <div class="trail-grid">{trail.map(item => <a href={`/${locale}/blog/${item.slug}/`}><span class="trail-year">{item.year}<span aria-hidden="true">↗</span></span><span>{zh ? item.zh : item.en}</span></a>)}</div>
+  </nav>}
+
+  <section class="archive-context" aria-labelledby="context-title">
+    <div class="context-copy"><p class="label">{zh ? '关于这份档案' : 'ABOUT THIS ARCHIVE'}</p><h2 id="context-title">{zh ? '回到当时，\n重新理解那些选择。' : 'Return to the moment.\nReconsider the choices.'}</h2><div class="intro"><Content /></div></div>
+    <figure class="source-document">
+      <a href="https://www.w3.org/History/1989/proposal.html" aria-label={zh ? '阅读 W3C 存档的 1989 年原始提案' : 'Read the original 1989 proposal in the W3C archive'}>
+        <div class="document-label">SOURCE / 001 <span>MAR 1989 ↗</span></div>
+        <Image src="https://toddzheng.net/media/proposal-1989-mesh-diagram-7ca522e8.png" inferSize width={640} alt={zh ? '1989 年提案中的 Mesh 关系图' : 'The Mesh relationship diagram from the 1989 proposal'} loading="lazy" />
+      </a>
+      <figcaption>{zh ? '《Information Management: A Proposal》原图，未修改。' : 'Original diagram from “Information Management: A Proposal”, unmodified.'} © Tim Berners-Lee / CERN, 1989. <a href="https://www.w3.org/History/1989/proposal.html">W3C archive</a> · <a href="https://www.w3.org/copyright/document-license-2023/">W3C Document License</a>.</figcaption>
+    </figure>
+  </section>
+
+  <section class="reading-room" aria-labelledby="reading-title">
+    <div class="reading-heading"><div><p class="label">{zh ? '从序言开始，按顺序阅读' : 'START WITH THE PREFACE. FOLLOW THE THREAD.'}</p><h2 id="reading-title">{zh ? '阅读目录' : 'Inside the archive'}</h2></div><span>{String(posts.length).padStart(2, '0')} {zh ? '篇' : 'ESSAYS'}</span></div>
+    {posts.length === 0 ? <p>{t('series.empty', locale)}</p> : <ol class="archive-entries">
+      {posts.map((post, i) => {
+        const subject = subjects[post.id.replace(`${locale}/`, '')];
+        return <li><a href={postUrl(post, locale)}>
+          <span class="entry-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <div class="entry-copy"><p class="label">{subject && <><span class="period">{subject.period}</span>{zh ? subject.zh : subject.en}</>}</p><h3>{post.data.title}</h3><p class="entry-description">{post.data.description}</p><span class="reading-time">{readingStats(post.body ?? '').minutes} {zh ? '分钟阅读' : 'min read'}</span></div>
+          <span class="entry-arrow" aria-hidden="true">↗</span>
+        </a></li>;
+      })}
+    </ol>}
+    {entry.data.status === 'ongoing' && <div class="archive-colophon"><span class="status-dot" aria-hidden="true"></span><p>{entry.data.upNext ?? (zh ? '档案仍在续写。新篇章会沿着这条线索，继续向前。' : 'The archive is still growing. New chapters will continue along this thread.')}</p><a href={`/${locale}/subscribe/`}>{zh ? '订阅后续更新' : 'Follow new chapters'} ↗</a></div>}
+  </section>
+</div>
+<style>
+  .dotcom-archive { --paper: #ded5bd; --archive-ink: #30362d; --archive-muted: #b4b9ac; }
+  .archive-topline { display: flex; justify-content: space-between; gap: 1em; margin-bottom: 1.5em; font: .65rem/1.6 var(--font-jetbrains), monospace; }
+  .archive-topline a { color: #c0c5cd; }
+  .archive-topline > span { color: #959eac; letter-spacing: .05em; }
+  .archive-cover { display: grid; grid-template-columns: 1fr 1fr; background: #181e1c; border-top: 3px solid #ba3c2f; }
+  .cover-copy { padding: 2.5em 2em; }
+  .label { font: .64rem/1.7 var(--font-jetbrains), monospace; color: var(--archive-muted); letter-spacing: .06em; margin: 0 0 1.3em; display: flex; align-items: center; gap: .7em; flex-wrap: wrap; }
+  .status-dot { display: inline-block; flex: none; width: 6px; height: 6px; background: #dfbc68; border-radius: 50%; }
+  .cover-copy h1 { font-size: clamp(1.9rem, 3.7vw, 3rem); line-height: 1.15; letter-spacing: -.045em; color: #ede5d1; margin: 0 0 .6em; }
+  .lede { font: 1.6rem/1.25 Georgia, 'Songti SC', serif; color: #d2c5a8; white-space: pre-line; margin: 0 0 1em; }
+  .description { font-size: .78em; color: #b4b9ac; line-height: 1.85; margin: 0 0 1.8em; }
+  .start-reading { display: inline-flex; align-items: center; gap: 2em; background: #ded5bd; color: #30362d; padding: .8em 1.2em; font-size: .75em; font-weight: 600; }
+  .start-reading:hover { background: #eee5ce; }
+  .cover-meta { font: .61rem/1.6 var(--font-jetbrains), monospace; color: #b4b9ac; margin: 1.4em 0 0; }
+  .cover-meta span { margin: 0 .6em; color: #6c7566; }
+  .cover-art { background: var(--paper); display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 2em 0; }
+  .cover-caption { margin: 2.5em 2em 0; padding-top: 1em; border-top: 1px solid #a19d89; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 1em; font: .6rem/1.6 var(--font-jetbrains), monospace; color: #4c5347; }
+  .cover-caption span:first-child { font: 1.6rem/1 Georgia, serif; }
+  .history-trail { margin: 2.5em 0 0; }
+  .trail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .trail-grid a { border-top: 1px solid #666d63; position: relative; padding: 1em 1em 1em 0; color: #c0c5bd; font-size: .7em; }
+  .trail-grid a::before { content: ''; position: absolute; top: -4px; left: 0; width: 7px; height: 7px; background: #c55847; }
+  .trail-year { display: block; font: 1.8rem/1.4 Georgia, serif; color: #e7dfca; }
+  .trail-year span { font: .8rem/1 sans-serif; padding-left: 1.2em; color: #b3a586; }
+  .trail-grid a:hover .trail-year { color: #f0c040; }
+  .archive-context { display: grid; grid-template-columns: 1.1fr 1fr; gap: 4em; margin: 3.5em 0 4em; align-items: start; }
+  .context-copy h2 { font: 2rem/1.3 Georgia, 'Songti SC', serif; color: #e7dfca; white-space: pre-line; }
+  .intro { font-size: .81em; line-height: 1.95; color: #b6bdb7; }
+  .intro :global(p:first-child) { margin-top: 1.6em; }
+  .source-document { margin: 0; }
+  .source-document > a { display: block; padding: 1em; background: #e6e0d1; color: #32392f; border-bottom: 3px solid #b33d31; }
+  .document-label { display: flex; justify-content: space-between; font: .6rem/1.6 var(--font-jetbrains), monospace; border-bottom: 1px solid #b0b0a2; padding-bottom: 1em; margin-bottom: 1em; }
+  .source-document img { display: block; width: 100%; height: auto; border-radius: 0; }
+  figcaption { font-size: .57em; line-height: 1.8; color: #a7afa5; padding-top: .8em; }
+  figcaption a { color: #c9bd9c; text-decoration: underline; text-underline-offset: 2px; }
+  .reading-heading { display: flex; justify-content: space-between; align-items: end; gap: 1em; border-top: 1px solid #73776b; padding-top: 1.4em; }
+  .reading-heading h2 { color: #e7dfca; font-size: 1.7em; }
+  .reading-heading .label { margin-bottom: .6em; }
+  .reading-heading > span { font: .7rem/1.6 var(--font-jetbrains), monospace; color: #a7afa5; flex: none; }
+  .archive-entries { list-style: none; margin: 1.3em 0 0; padding: 0; }
+  .archive-entries li { border-top: 1px solid var(--border); }
+  .archive-entries a { display: grid; grid-template-columns: 65px minmax(0, 1fr) 30px; gap: 1.5em; padding: 1.9em 0; color: var(--text); }
+  .entry-number { font: 2.2rem/1.2 Georgia, serif; color: #9eaa99; }
+  .entry-copy .label { margin-bottom: .85em; }
+  .period { color: #dbcaa4; padding-right: 1em; border-right: 1px solid #606858; }
+  .entry-copy h3 { font-size: 1.3em; line-height: 1.4; max-width: 800px; }
+  .entry-description { font-size: .78em; color: #a7b0a7; line-height: 1.8; margin: .85em 0; max-width: 780px; }
+  .reading-time { font: .61rem/1.6 var(--font-jetbrains), monospace; color: #a7afa5; }
+  .entry-arrow { color: #d1b792; font-size: 1.2em; }
+  .archive-entries a:hover h3 { color: #dfcfa9; }
+  .archive-colophon { display: flex; align-items: baseline; flex-wrap: wrap; gap: .8em; border-top: 1px solid #626959; padding: 1.5em 0; font-size: .73em; color: #b4b9ac; }
+  .archive-colophon p { flex: 1; min-width: 170px; margin: 0; }
+  .archive-colophon a { color: #dfcfa9; }
+  a:focus-visible { outline: 2px solid var(--accent-amber); outline-offset: 5px; }
+  @media (max-width: 720px) {
+    .archive-topline { font-size: .58rem; }
+    .archive-topline > span { display: none; }
+    .archive-cover { grid-template-columns: 1fr; }
+    .cover-copy { padding: 1.6em 1.3em; }
+    .cover-copy h1 { font-size: 2rem; }
+    .lede { font-size: 1.4rem; }
+    .cover-art { padding: .5em 0 1.4em; }
+    .cover-caption { margin: .6em 1.6em 0; }
+    .trail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1em; }
+    .history-trail { margin-top: 2em; }
+    .archive-context { grid-template-columns: 1fr; gap: 2em; margin: 2em 0 2.5em; }
+    .context-copy h2 { font-size: 1.7rem; }
+    .reading-heading h2 { font-size: 1.5em; }
+    .reading-heading .label { font-size: .55rem; }
+    .archive-entries a { grid-template-columns: 28px minmax(0, 1fr) 12px; gap: .7em; padding: 1.5em 0; }
+    .entry-number { font-size: 1.5rem; }
+    .entry-copy h3 { font-size: 1.1em; }
+    .entry-description { font-size: .76em; }
+    .entry-copy .label { font-size: .56rem; }
+  }
+</style>
