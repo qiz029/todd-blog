@@ -2,9 +2,9 @@
 title: "Decoupling the Agent Core from the Tool Runtime"
 description: "What OpenAI's Agents API protocol reveals about the next shift in agent architecture: decoupling the persistent Agent Core from thin Tool Runtimes so one agent can operate N computers as peripherals without cross-machine A2A."
 pubDate: 2026-11-12T20:50:00Z
+updatedDate: 2026-11-12
 heroImage: "https://toddzheng.net/media/01-coupled-vs-decoupled-en-1b7c9848.png"
 tags: ["ai", "agents", "openai", "mcp", "software-engineering"]
-draft: true
 ---
 
 > I have been looking into the protocol design of OpenAI's Agents API recently. Setting aside the surface-level abstractions, I think the protocol points to a much more important architectural shift underneath: decoupling the Agent Core from the Tool Runtime (or rather, multiple Tool Runtimes). This means we can have a single, persistent agent with continuous memory operating N different computers at once, without needing agents on different machines to talk to each other over A2A.
