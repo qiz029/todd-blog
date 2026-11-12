@@ -65,6 +65,14 @@ This theme is based off of the lovely [Bear Blog](https://github.com/HermanMarti
 ## CMS
 GET /api then follow OpenAPI; never use a CLI. See cms/README.md.
 
+## Traffic analytics
+
+Cloudflare Web Analytics is enabled for `toddzheng.net` using automatic script installation at the edge. Do not add a second beacon to Astro templates. Local previews and build output do not include the injected script. Cloudflare also measures Astro's client-side navigation automatically.
+
+Open [Web Analytics](https://dash.cloudflare.com/221784d24eb2a95d148bc96b6f06d6be/web-analytics), select `toddzheng.net`, and choose a time range. Use **Exclude Bots = Yes** for a closer estimate of reader traffic; view **Path** for article popularity and **Referer** for traffic sources. These browser metrics differ from zone-level HTTP request and unique-IP counts. Test visits can appear in the reports.
+
+The English and Chinese About pages disclose the use of cookie-free Cloudflare Web Analytics. See [Cloudflare's metrics and dimensions](https://developers.cloudflare.com/web-analytics/data-metrics/dimensions/).
+
 ## Text highlights
 
 Use inline HTML in Markdown or MDX (including CMS post bodies):

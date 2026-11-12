@@ -58,6 +58,8 @@ const locale = 'zh';
         <li><BilibiliLink>{t('about.bilibili', locale)}</BilibiliLink></li>
         <li><a href="/zh/subscribe/">RSS</a></li>
       </ul>
+      <h2>{t('about.site', locale)}</h2>
+      <p set:html={t('about.site.text', locale)} />
     </main>
     <Footer locale={locale} />
   </body>

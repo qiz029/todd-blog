@@ -143,8 +143,8 @@ const dict: Record<string, Record<string, string>> = {
 
   // About: About this site
   'about.site.text': {
-    en: 'Built with <a href="https://astro.build">Astro</a>, deployed on Cloudflare Pages. I write in Markdown and push to deploy. No tracking, no analytics, no comments. Just text on a page.',
-    zh: '本站用 <a href="https://astro.build">Astro</a> 构建，部署在 Cloudflare Pages。我用 Markdown 写作，git push 即发布。没有追踪、没有分析、没有评论。只是页面上的文字。',
+    en: 'Built with <a href="https://astro.build">Astro</a> and hosted on Cloudflare. I write in Markdown. <a href="https://www.cloudflare.com/web-analytics/">Cloudflare Web Analytics</a> helps me understand which articles people read and where visits come from, without analytics cookies.',
+    zh: '本站用 <a href="https://astro.build">Astro</a> 构建，托管在 Cloudflare，文章用 Markdown 编写。通过 <a href="https://www.cloudflare.com/web-analytics/">Cloudflare Web Analytics</a> 了解文章浏览量和访问来源，不使用分析 Cookie。',
   },
 
   // Elsewhere
