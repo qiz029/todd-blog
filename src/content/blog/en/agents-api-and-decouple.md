@@ -1,7 +1,7 @@
 ---
 title: "Decoupling the Agent Core from the Tool Runtime"
 description: "What OpenAI's Agents API protocol reveals about the next shift in agent architecture: decoupling the persistent Agent Core from thin Tool Runtimes so one agent can operate N computers as peripherals without cross-machine A2A."
-pubDate: 2026-11-12T20:50:00Z
+pubDate: 2026-11-12T20:55:00Z
 updatedDate: 2026-11-12
 heroImage: "https://toddzheng.net/media/01-coupled-vs-decoupled-en-1b7c9848.png"
 tags: ["ai", "agents", "openai", "mcp", "software-engineering"]
