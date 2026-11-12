@@ -2,18 +2,18 @@
 import { t } from '../i18n/translations';
 import BilibiliLink from './BilibiliLink.astro';
 const today = new Date();
-const { locale = 'en' } = Astro.props;
+const { locale = 'en', showSubscribe = true } = Astro.props;
 const feedPath = `/${locale}/rss.xml`;
 const feedURL = new URL(feedPath, Astro.site).href;
 ---
 
 <footer>
-  <section class="rss-subscribe" aria-label={t('rss.heading', locale)}>
+  {showSubscribe && <section class="rss-subscribe" aria-label={t('rss.heading', locale)}>
     <div class="rss-heading">{t('rss.heading', locale)}</div>
     <p>{t('rss.description', locale)}</p>
-    <a class="rss-button" href={feedPath} type="application/rss+xml">{t('rss.link', locale)} <span aria-hidden="true">↗</span></a>
+    <a class="rss-button" href={`/${locale}/subscribe/`}>{t('rss.link', locale)} <span aria-hidden="true">→</span></a>
     <span class="feed-address">{feedURL}</span>
-  </section>
+  </section>}
   <hr />
   <div class="footer-content">
     <span>&copy; {today.getFullYear()} Todd Zheng</span>

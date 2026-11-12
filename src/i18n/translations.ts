@@ -10,6 +10,18 @@ const dict: Record<string, Record<string, string>> = {
   'rss.link': { en: 'Subscribe via RSS', zh: 'RSS 订阅' },
   'rss.heading': { en: 'Keep up with new writing', zh: '订阅新文章' },
   'rss.description': { en: 'Read new articles in full in your RSS reader. Add the feed address below to subscribe.', zh: '在 RSS 阅读器里阅读新文章全文。将下方地址添加到阅读器，即可订阅。' },
+  'rss.intro': { en: 'Get new articles in your RSS reader, with the full text ready to read. RSS lets you follow writing from different websites in one place.', zh: '通过 RSS 阅读器接收新文章，直接阅读全文。RSS 可以把你关注的不同网站的更新汇集到一处。' },
+  'rss.address': { en: 'English feed address', zh: '中文订阅地址' },
+  'rss.copy': { en: 'Copy feed address', zh: '复制订阅地址' },
+  'rss.copied': { en: 'Address copied. Paste it into your RSS reader to subscribe.', zh: '地址已复制。粘贴到 RSS 阅读器中即可订阅。' },
+  'rss.copyFailed': { en: 'Copy the selected address manually, then paste it into your RSS reader.', zh: '请手动复制选中的地址，再粘贴到 RSS 阅读器中。' },
+  'rss.stepsHeading': { en: 'How to subscribe', zh: '如何订阅' },
+  'rss.step1': { en: 'Copy the feed address above.', zh: '复制上方的订阅地址。' },
+  'rss.step2': { en: 'Open your RSS reader and choose “Add feed” or “Follow website”.', zh: '打开 RSS 阅读器，选择「添加订阅」或「关注网站」。' },
+  'rss.step3': { en: 'Paste the address and confirm. New articles will appear in your reader.', zh: '粘贴地址并确认，之后就能在阅读器中收到新文章。' },
+  'rss.browserNote': { en: 'The raw feed is meant for RSS readers. Opening it in a browser may show plain text or XML instead of a regular web page.', zh: '原始订阅源供 RSS 阅读器使用。直接在浏览器中打开时，可能只显示纯文本或 XML，而不是普通网页。' },
+  'rss.raw': { en: 'Open raw RSS feed (XML)', zh: '打开原始 RSS 订阅源（XML）' },
+  'rss.browse': { en: 'Or read articles on the blog →', zh: '也可以直接在博客阅读文章 →' },
 
   // Command palette
   'palette.trigger':      { en: 'Search', zh: '搜索' },

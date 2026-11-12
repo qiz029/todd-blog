@@ -1,0 +1,122 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { t } from '../i18n/translations';
+
+interface Props { locale: 'en' | 'zh' }
+const { locale } = Astro.props;
+const feedPath = `/${locale}/rss.xml`;
+const feedURL = new URL(feedPath, Astro.site).href;
+---
+
+<!doctype html>
+<html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <BaseHead title={`${t('rss.link', locale)} — ${SITE_TITLE}`} description={t('rss.intro', locale)} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>{t('rss.heading', locale)}</h1>
+      <p class="intro">{t('rss.intro', locale)}</p>
+
+      <rss-feed-copy data-success={t('rss.copied', locale)} data-failure={t('rss.copyFailed', locale)}>
+        <label for="feed-address">{t('rss.address', locale)}</label>
+        <input id="feed-address" type="text" value={feedURL} readonly spellcheck="false" />
+        <button type="button" hidden>{t('rss.copy', locale)}</button>
+        <p class="copy-status" role="status" aria-live="polite" aria-atomic="true"></p>
+      </rss-feed-copy>
+
+      <h2>{t('rss.stepsHeading', locale)}</h2>
+      <ol>
+        <li>{t('rss.step1', locale)}</li>
+        <li>{t('rss.step2', locale)}</li>
+        <li>{t('rss.step3', locale)}</li>
+      </ol>
+      <aside>
+        <p>{t('rss.browserNote', locale)}</p>
+        <a href={feedPath} type="application/rss+xml" data-astro-reload>{t('rss.raw', locale)}</a>
+      </aside>
+      <p><a href={`/${locale}/blog/`}>{t('rss.browse', locale)}</a></p>
+    </main>
+    <Footer locale={locale} showSubscribe={false} />
+  </body>
+</html>
+
+<script>
+  // Custom elements reconnect when Astro's client router swaps in a new page.
+  class RssFeedCopy extends HTMLElement {
+    connectedCallback() {
+      const input = this.querySelector('input');
+      const button = this.querySelector('button');
+      const status = this.querySelector<HTMLElement>('[role="status"]');
+      if (!input || !button || !status) return;
+
+      input.onclick = () => input.select();
+      button.hidden = false;
+      button.onclick = async () => {
+        status.textContent = '';
+        try {
+          await navigator.clipboard.writeText(input.value);
+          status.textContent = this.dataset.success ?? '';
+        } catch {
+          input.focus();
+          input.select();
+          input.setSelectionRange(0, input.value.length);
+          status.textContent = this.dataset.failure ?? '';
+        }
+      };
+    }
+  }
+  if (!customElements.get('rss-feed-copy')) customElements.define('rss-feed-copy', RssFeedCopy);
+</script>
+
+<style>
+  main { max-width: min(680px, calc(100% - 2em)); }
+  h1 { font-size: clamp(2rem, 6vw, 3rem); }
+  h2 { font-size: 1.4em; margin-top: 2em; }
+  .intro, aside { color: var(--text-muted); }
+  rss-feed-copy {
+    display: block;
+    margin: 2em 0;
+    padding: 1.25em;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-amber);
+    border-radius: 6px;
+  }
+  label { display: block; margin-bottom: 0.65em; font-weight: 600; }
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.75em;
+    border-radius: 4px;
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 16px;
+  }
+  button {
+    margin-top: 1em;
+    padding: 0.65em 1em;
+    background: var(--accent-amber);
+    color: var(--bg);
+    border: 1px solid var(--accent-amber);
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.9em;
+    cursor: pointer;
+  }
+  button:hover { filter: brightness(1.1); }
+  :is(input, button, a):focus-visible { outline: 2px solid var(--accent-amber); outline-offset: 4px; }
+  .copy-status { margin: 0.75em 0 0; font-size: 0.85em; color: var(--accent-amber); }
+  .copy-status:empty { margin: 0; }
+  ol { padding-left: 1.5em; }
+  li { margin: 0.6em 0; }
+  aside { margin: 2em 0; padding-top: 1em; border-top: 1px solid var(--border); font-size: 0.9em; }
+  a { color: var(--accent-amber); text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 480px) {
+    rss-feed-copy { padding: 1em; }
+    button { width: 100%; }
+  }
+</style>
