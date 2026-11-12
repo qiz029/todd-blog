@@ -2,9 +2,9 @@
 title: "Agent 核心与工具运行时的解耦"
 description: "从 OpenAI Agents API 的协议设计看 Agent 架构演进：当 Agent 核心与工具运行时彻底解耦，电脑退化为热插拔外设，一个持久化核心即可同时操作 N 台电脑，不再需要为跨机器协作付出 A2A 传话损耗。"
 pubDate: 2026-11-12T20:50:00Z
+updatedDate: 2026-11-12
 heroImage: "https://toddzheng.net/media/01-coupled-vs-decoupled-d15eec01.png"
 tags: ["AI", "Agent", "OpenAI", "MCP", "软件工程"]
-draft: true
 ---
 
 > 最近在看OpenAI的Agents API的protocol设计。抛开外面包着的那些概念不谈，我觉得这个protocol底下藏着一个很重要的趋势：Agent核心（Agent Core）和工具运行时（Tool Runtime，或者说多个Tool Runtimes）的解耦。这意味着我们可以有一个带持久记忆的agent，同时去操作N台不同的电脑，而不再需要让不同电脑上的agent之间去搞什么A2A通信。
