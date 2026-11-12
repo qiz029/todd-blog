@@ -7,7 +7,7 @@ const locale = Astro.currentLocale || 'en';
 const otherLocale = locale === 'zh' ? 'en' : 'zh';
 
 const posts = await getCollection('blog', (entry) => entry.id.startsWith(`${locale}/`) && !entry.data.draft);
-// Every post is searchable; the list is titles only, so it stays small.
+// Search metadata for every published post without shipping full article bodies.
 const recentPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const pages = [
@@ -27,6 +27,8 @@ const items = [
   ...recentPosts.map((post) => ({
     group: t('palette.group.posts', locale),
     title: post.data.title,
+    description: post.data.description,
+    tags: post.data.tags,
     url: `/${locale}/blog/${post.id.slice(locale.length + 1)}/`,
   })),
 ];
@@ -34,7 +36,7 @@ const items = [
 const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
 ---
 
-<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Command palette" hidden>
+<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label={t('palette.trigger', locale)} hidden>
   <div class="palette-backdrop" data-palette-close></div>
   <div class="palette-box">
     <div class="palette-input-row">
@@ -51,7 +53,7 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
         spellcheck="false"
         aria-label={t('palette.trigger', locale)}
       />
-      <kbd>esc</kbd>
+      <button type="button" class="palette-close" data-palette-close aria-label={t('palette.hint.close', locale)}>×</button>
     </div>
     <ul class="palette-list" id="palette-list" role="listbox" aria-label={t('palette.trigger', locale)} data-empty={t('palette.empty', locale)}></ul>
     <div class="palette-foot">
@@ -103,20 +105,27 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
   .palette-prompt { color: var(--accent); font-size: 0.85em; }
   #palette-input {
     flex: 1;
+    min-width: 0;
     padding: 0;
     border: 0;
     background: transparent;
     color: var(--text);
     font-family: inherit;
-    font-size: 0.92em;
+    font-size: 16px;
     outline: none;
   }
   #palette-input::placeholder { color: var(--text-muted); }
+  .palette-close { flex: none; min-width: 44px; min-height: 44px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); font-size: 1.4em; cursor: pointer; }
+  .palette-close:focus-visible { outline: 2px solid var(--accent-amber); outline-offset: 2px; }
+  .palette-list :global(.palette-copy) { min-width: 0; overflow-wrap: anywhere; }
+  .palette-list :global(.palette-description) { display: block; color: var(--text-muted); font-size: 0.85em; margin-top: 0.35em; }
+  .palette-list :global(.palette-tags) { display: block; color: var(--accent-amber); font-size: 0.8em; margin-top: 0.35em; }
   .palette-list {
     list-style: none;
     margin: 0;
     padding: 0.4em;
     max-height: 320px;
+    max-height: min(320px, 50dvh);
     overflow-y: auto;
   }
   .palette-list :global(.palette-group) {
@@ -175,12 +184,19 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
   @media (prefers-reduced-motion: reduce) {
     .palette-backdrop, .palette-box { animation: none; }
   }
+  @media (max-width: 600px) {
+    .palette { padding-top: 3dvh; }
+    .palette-foot { display: none; }
+    .palette-input-row { padding: 0.5em; gap: 0.4em; }
+    .palette-prompt { display: none; }
+  }
 </style>
 
 <script>
   import { navigate } from 'astro:transitions/client';
+  import { matchesSearch } from '../lib/search';
 
-  interface PaletteItem { group: string; title: string; url: string; external?: boolean; }
+  interface PaletteItem { group: string; title: string; url: string; external?: boolean; description?: string; tags?: string[]; }
 
   let paletteItems: PaletteItem[] = [];
   let matched: PaletteItem[] = [];
@@ -234,8 +250,7 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
   const renderPalette = (query: string) => {
     const { input, list } = els();
     if (!list) return;
-    const q = query.trim().toLowerCase();
-    matched = q ? paletteItems.filter((item) => item.title.toLowerCase().includes(q)) : paletteItems;
+    matched = paletteItems.filter((item) => matchesSearch(item, query));
     paletteActive = 0;
     list.innerHTML = '';
     if (!matched.length) {
@@ -260,7 +275,24 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
       const li = document.createElement('li');
       li.id = `palette-opt-${i}`;
       li.className = 'palette-item';
-      li.textContent = item.title;
+      const copy = document.createElement('span');
+      copy.className = 'palette-copy';
+      const title = document.createElement('span');
+      title.textContent = item.title;
+      copy.appendChild(title);
+      if (query.trim() && item.description) {
+        const description = document.createElement('span');
+        description.className = 'palette-description';
+        description.textContent = item.description;
+        copy.appendChild(description);
+      }
+      if (query.trim() && item.tags?.length) {
+        const tags = document.createElement('span');
+        tags.className = 'palette-tags';
+        tags.textContent = item.tags.map((tag) => `#${tag}`).join(' ');
+        copy.appendChild(tags);
+      }
+      li.appendChild(copy);
       li.setAttribute('role', 'option');
       li.addEventListener('mousemove', () => {
         if (paletteActive !== i) setPaletteActive(i);
@@ -291,17 +323,22 @@ const itemsJson = JSON.stringify(items).replace(/</g, '\\u003c');
 
     input.addEventListener('input', () => renderPalette(input.value));
     input.addEventListener('keydown', (event) => {
+      if (event.isComposing) return;
       if (event.key === 'ArrowDown') { event.preventDefault(); movePaletteActive(1); }
       else if (event.key === 'ArrowUp') { event.preventDefault(); movePaletteActive(-1); }
       else if (event.key === 'Enter') {
         const item = matched[paletteActive];
         if (item) { event.preventDefault(); openItem(item); }
-      } else if (event.key === 'Tab') {
-        // The input is the only focusable control inside the dialog; keep focus there.
-        event.preventDefault();
       }
     });
-    palette.querySelector('[data-palette-close]')?.addEventListener('click', closePalette);
+    palette.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      const close = palette.querySelector<HTMLButtonElement>('.palette-close');
+      if (!close) return;
+      if (event.shiftKey && document.activeElement === input) { event.preventDefault(); close.focus(); }
+      else if (!event.shiftKey && document.activeElement === close) { event.preventDefault(); input.focus(); }
+    });
+    palette.querySelectorAll('[data-palette-close]').forEach((el) => el.addEventListener('click', closePalette));
     document.querySelectorAll('.palette-trigger').forEach((btn) => {
       btn.addEventListener('click', openPalette);
     });

@@ -73,6 +73,12 @@ Open [Web Analytics](https://dash.cloudflare.com/221784d24eb2a95d148bc96b6f06d6b
 
 The English and Chinese About pages disclose the use of cookie-free Cloudflare Web Analytics. See [Cloudflare's metrics and dimensions](https://developers.cloudflare.com/web-analytics/data-metrics/dimensions/).
 
+## Reliable builds
+
+Use `npm run build` to build for deployment. It loads a build-only media transport before Astro starts: public `https://toddzheng.net/media/` images have a 15-second timeout per attempt and up to three attempts for transient failures. Successful images are validated, then their bytes, dimensions and cache expiry are stored atomically in `.cache/media/`. Fresh entries are reused across pages and builds, so dimension probes do not repeatedly fetch the same image. Each probe receives an independent stream and can safely cancel it.
+
+Preserve `.cache/media/` between CI builds to reuse downloads, or remove that directory to force a refresh. Missing, invalid or expired images must download successfully; the build fails with the image URL instead of silently publishing broken images. The cache follows origin expiry and does not store private or `no-store` responses. It does not intercept browser traffic, CMS requests or third-party APIs.
+
 ## Text highlights
 
 Use inline HTML in Markdown or MDX (including CMS post bodies):

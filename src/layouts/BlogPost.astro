@@ -293,7 +293,15 @@ const shareLinks = [
       .toc {
         display: none;
       }
+      .mobile-toc { margin: 1.5em 0; padding: 0.8em 1em; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); font-size: 0.9em; }
+      .mobile-toc summary { cursor: pointer; color: var(--accent-amber); min-height: 44px; align-content: center; }
+      .mobile-toc ul { list-style: none; padding: 0; margin: 0.8em 0 0; }
+      .mobile-toc li.d3 { padding-left: 1em; }
+      .mobile-toc a { display: block; padding: 0.45em 0; color: var(--text); overflow-wrap: anywhere; }
+      .mobile-toc :is(summary, a):focus-visible { outline: 2px solid var(--accent-amber); outline-offset: 3px; }
+      .prose :global(:is(h2, h3)[id]) { scroll-margin-top: 1em; }
       @media (min-width: 1220px) {
+        .mobile-toc { display: none; }
         .post-grid {
           grid-template-columns: minmax(0, 1fr) minmax(0, 800px) minmax(0, 1fr);
           column-gap: 1em;
@@ -556,6 +564,18 @@ const shareLinks = [
               )}
               <hr />
             </div>
+            {tocHeadings.length >= 2 && (
+              <details class="mobile-toc">
+                <summary>{t('post.toc', locale)}</summary>
+                <nav aria-label={t('post.toc', locale)}>
+                  <ul>
+                    {tocHeadings.map((h) => (
+                      <li class:list={[`d${h.depth}`]}><a href={`#${h.slug}`}>{h.text}</a></li>
+                    ))}
+                  </ul>
+                </nav>
+              </details>
+            )}
             {bilibili && (
               <BilibiliEmbed
                 bv={bilibili}

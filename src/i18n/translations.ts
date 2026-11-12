@@ -25,7 +25,7 @@ const dict: Record<string, Record<string, string>> = {
 
   // Command palette
   'palette.trigger':      { en: 'Search', zh: '搜索' },
-  'palette.placeholder':  { en: 'Type to search pages and posts…', zh: '输入以搜索页面和文章…' },
+  'palette.placeholder':  { en: 'Search titles, summaries and tags…', zh: '搜索标题、摘要和标签…' },
   'palette.empty':        { en: 'No matching commands', zh: '没有匹配的命令' },
   'palette.group.pages':  { en: 'Pages', zh: '页面' },
   'palette.group.posts':  { en: 'Writing', zh: '文章' },
